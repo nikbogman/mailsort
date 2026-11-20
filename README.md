@@ -116,4 +116,4 @@ Every push to `main` publishes it to GitHub Pages.
 
 ## Built with AI
 
-Built with **Claude Code** as the main coding tool. I set the direction: what it does, how it's structured, how it looks and what it keeps local. Claude wrote most of the code and the design iterations, and I reviewed and tested each change against my own inbox.
+All code written by Claude (Claude Code).
