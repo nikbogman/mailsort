@@ -1,6 +1,6 @@
 [package]
 name = "mailsort"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 
 [dependencies]
@@ -27,3 +27,6 @@ tokio = { version = "1.54.1", features = ["full"] }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 dioxus = { version = "0.7.10", features = ["web"] }
 gloo-timers = { version = "0.3", features = ["futures"] }
+
+[build-dependencies]
+winresource = "0.1"

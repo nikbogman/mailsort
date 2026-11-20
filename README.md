@@ -116,4 +116,4 @@ Every push to `main` publishes it to GitHub Pages.
 
 ## Built with AI
 
-This project was written with AI assistance, mostly **Claude Code** (Anthropic). I set the goals, made the product and design decisions, reviewed the changes and tested the app on my own inbox; most of the code, the UI design iterations and this README were drafted by the AI. I'm sharing that openly so anyone reviewing the repo knows how it was made.
+Built with **Claude Code** as the main coding tool. I set the direction: what it does, how it's structured, how it looks and what it keeps local. Claude wrote most of the code and the design iterations, and I reviewed and tested each change against my own inbox.
