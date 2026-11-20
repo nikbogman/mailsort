@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/icon.svg" width="96" height="96" alt="mailsort icon">
+
 # mailsort
 
 My Gmail inbox, sorted by a model running on my own machine: emails grouped by who sent them and what about, each group with a summary and a verdict, and cleaned up in a few clicks.
@@ -17,7 +19,7 @@ My Gmail inbox, sorted by a model running on my own machine: emails grouped by w
 
 ## Why I built it
 
-I get **a lot of email and never sorted any of it**, so years of it piled up. I wanted something to **go through it for me**: tell the bank from the newsletters, and tell me what can go. I vibecoded the whole thing.
+I get **a lot of email and never sorted any of it**, so years of it piled up. I wanted something to **go through it for me**: tell the bank from the newsletters, and tell me what can go.
 
 It uses a **local model, Qwen 2.5 3B through Ollama**, because I don't want a cloud model reading my inbox. Not because any single email is a big secret, but because **an inbox is the master key to everything else**: every password reset, sign-in code and bank notice lands there. Whoever can read it can get into the rest, so it stays on my machine.
 
@@ -60,7 +62,7 @@ It runs **next to Ollama**, on the same machine, so a desktop app was the natura
 
 ## Run it
 
-Notes for me, or an AI agent, to set it up again. It needs [Rust](https://rustup.rs), [Ollama](https://ollama.com) and a Google Cloud project.
+It needs [Rust](https://rustup.rs), [Ollama](https://ollama.com) and a Google Cloud project.
 
 1. Google Cloud: enable the **Gmail API**, set up the consent screen (External, me as a test user), create a **Desktop app** OAuth client and download its JSON.
 2. Pull the model:
@@ -106,7 +108,12 @@ sh web/build.sh   # writes dist/, serve it with any static server
 
 Every push to `main` publishes it to GitHub Pages.
 
-## Notes
+## Scope and privacy
 
-- Built for one person, me, on Windows.
-- Email leaves my machine only to and from Gmail itself; the model and the cache are local.
+- **Personal tool.** Built for my own inbox on Windows. The desktop app isn't packaged or tested for other platforms.
+- **Local by design.** Mail only travels between this machine and Gmail. The model, its prompts and the SQLite cache never leave the machine, and there's no telemetry.
+- **Google sign-in.** It uses your own Google Cloud OAuth client in testing mode, so only accounts you add as test users can sign in.
+
+## Built with AI
+
+This project was written with AI assistance, mostly **Claude Code** (Anthropic). I set the goals, made the product and design decisions, reviewed the changes and tested the app on my own inbox; most of the code, the UI design iterations and this README were drafted by the AI. I'm sharing that openly so anyone reviewing the repo knows how it was made.
