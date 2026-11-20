@@ -62,7 +62,6 @@ pub fn EmailToolbar() -> Element {
                 }
                 if !selected.is_empty() {
                     h1 { "{selected.len()} selected" }
-                    button { class: "btn ghost", onclick: move |_| s.selected.write().clear(), "Clear" }
                     span { class: "spacer" }
                     if trash {
                         button { class: "btn", onclick: move |_| queue::enqueue(s, Kind::Restore, s.targets()),
@@ -74,13 +73,12 @@ pub fn EmailToolbar() -> Element {
                             "Delete forever"
                         }
                     } else {
-                        button { class: "btn danger-ghost", title: "Delete forever (Shift+Del)", onclick: move |_| ask_delete(s, s.targets()),
+                        button { class: "icon danger", title: "Delete forever (Shift+Del)", "aria-label": "Delete forever", onclick: move |_| ask_delete(s, s.targets()),
                             {icon("deleteForever")}
-                            "Delete forever"
                         }
                         button { class: "btn danger", title: "Move to Trash (Del)", onclick: move |_| queue::enqueue(s, Kind::Trash, s.targets()),
                             {icon("trash")}
-                            "Move to Trash"
+                            "Trash"
                         }
                     }
                 } else if trash {
@@ -96,16 +94,14 @@ pub fn EmailToolbar() -> Element {
                 } else if let Some(g) = group {
                     {avatar(&g.org, "sm")}
                     h1 { "{g.org}" }
-                    span { class: "topic", "{g.topic}" }
                     span { class: "total", "{view.len()}" }
                     span { class: "spacer" }
-                    button { class: "btn danger-ghost", title: "Delete all forever", onclick: move |_| ask_delete(s, view_ids.clone()),
+                    button { class: "icon danger", title: "Delete all forever", "aria-label": "Delete all forever", onclick: move |_| ask_delete(s, view_ids.clone()),
                         {icon("deleteForever")}
-                        "Delete all"
                     }
                     button { class: "btn danger", onclick: move |_| queue::enqueue(s, Kind::Trash, trash_ids.clone()),
                         {icon("trash")}
-                        "Trash all {view.len()}"
+                        "Trash all"
                     }
                 }
             }

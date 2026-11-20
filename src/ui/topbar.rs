@@ -8,16 +8,17 @@ use super::{Filter, State, SyncState, close_group, show, start_sync};
 use crate::icons::icon;
 use crate::sync::{self, Stage};
 
-/// The app icon: a tiny inbox map (same drawing as the window icon in main.rs).
+/// The app icon at small size: a tiny inbox map (same drawing as the window icon in main.rs).
+/// Large renders (assets/icon.svg) hatch the red part instead, as in the design.
 pub fn logo() -> Element {
     rsx! {
         svg { class: "logo", width: "22", height: "22", view_box: "0 0 64 64", "aria-hidden": "true",
             rect { width: "64", height: "64", rx: "12", fill: "#1b1d22" }
-            rect { x: "6", y: "6", width: "30", height: "52", rx: "3", fill: "#c9b48c" }
-            rect { x: "6", y: "40", width: "30", height: "18", rx: "3", fill: "#d93636" }
-            rect { x: "38", y: "6", width: "20", height: "26", rx: "3", fill: "#2fb3a3" }
-            rect { x: "38", y: "34", width: "9", height: "24", rx: "3", fill: "#5b8def" }
-            rect { x: "49", y: "34", width: "9", height: "24", rx: "3", fill: "#9b7bea" }
+            rect { x: "6", y: "6", width: "30", height: "52", rx: "2", fill: "#c9b48c" }
+            rect { x: "6", y: "40", width: "30", height: "18", rx: "2", fill: "#d93636" }
+            rect { x: "38", y: "6", width: "20", height: "26", rx: "2", fill: "#2fb3a3" }
+            rect { x: "38", y: "34", width: "9", height: "24", rx: "2", fill: "#5b8def" }
+            rect { x: "49", y: "34", width: "9", height: "24", rx: "2", fill: "#9b7bea" }
         }
     }
 }
@@ -77,6 +78,7 @@ pub fn TopBar() -> Element {
             UpdateButton {}
             SyncStatus {}
             SearchBox {}
+            ThemeSwitch {}
             button {
                 class: if trash { "icon on" } else { "icon" },
                 title: "Trash",
@@ -152,6 +154,29 @@ fn UpdateButton() -> Element {
                 {icon("sync")}
                 if busy() { "Updating…" } else { "Update to {tag}" }
             }
+        }
+    }
+}
+
+/// Light/dark switch. The theme lives on <html data-theme> and in localStorage; a script in the page head applies it at startup.
+#[component]
+fn ThemeSwitch() -> Element {
+    const TOGGLE: &str = r#"
+        const r = document.documentElement;
+        const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        r.dataset.theme = dark ? "light" : "dark";
+        try { localStorage.setItem("theme", r.dataset.theme); } catch (e) {}
+    "#;
+    rsx! {
+        button {
+            class: "icon theme-btn",
+            title: "Light or dark theme",
+            "aria-label": "Switch theme",
+            onclick: move |_| {
+                document::eval(TOGGLE);
+            },
+            span { class: "moon", {icon("moon")} }
+            span { class: "sun", {icon("sun")} }
         }
     }
 }

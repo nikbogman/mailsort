@@ -15,7 +15,11 @@ const ASPECT: f64 = 2.0;
 
 /// Colour family of a category: one hue per category group.
 pub fn hue(category: &str) -> &'static str {
-    match CATEGORIES.iter().find(|c| c.name == category).map(|c| c.group) {
+    match CATEGORIES
+        .iter()
+        .find(|c| c.name == category)
+        .map(|c| c.group)
+    {
         Some("Important") => "imp",
         Some("Dev & services") => "dev",
         Some("Updates") => "upd",
@@ -65,11 +69,18 @@ fn blocks(s: &State, groups: &[Group]) -> Vec<Block> {
                 name: g.org.clone(),
                 sub: g.topic.clone(),
                 n: g.ids.len(),
-                go: if g.verdict() == Some(Verdict::Delete) { g.ids.len() } else { 0 },
+                go: if g.verdict() == Some(Verdict::Delete) {
+                    g.ids.len()
+                } else {
+                    0
+                },
                 hue: hue(&g.category),
                 icon: g.category.clone(),
                 keys: vec![g.key.clone()],
-                tip: g.summary.as_ref().map_or_else(|| format!("Latest: {}", g.subject), |x| x.summary.clone()),
+                tip: g
+                    .summary
+                    .as_ref()
+                    .map_or_else(|| format!("Latest: {}", g.subject), |x| x.summary.clone()),
             })
             .collect();
     }
@@ -79,11 +90,18 @@ fn blocks(s: &State, groups: &[Group]) -> Vec<Block> {
         if in_cat.is_empty() {
             continue;
         }
-        let gone: Vec<&&Group> = in_cat.iter().filter(|g| g.verdict() == Some(Verdict::Delete)).collect();
+        let gone: Vec<&&Group> = in_cat
+            .iter()
+            .filter(|g| g.verdict() == Some(Verdict::Delete))
+            .collect();
         out.push(Block {
             target: Target::Category(c.name.to_string()),
             name: c.name.to_string(),
-            sub: if in_cat.len() == 1 { "1 group".into() } else { format!("{} groups", in_cat.len()) },
+            sub: if in_cat.len() == 1 {
+                "1 group".into()
+            } else {
+                format!("{} groups", in_cat.len())
+            },
             n: in_cat.iter().map(|g| g.ids.len()).sum(),
             go: gone.iter().map(|g| g.ids.len()).sum(),
             hue: hue(c.name),
@@ -144,7 +162,10 @@ fn MapHeader() -> Element {
     let (by_verdict, _) = totals(&s.groups.read());
     let groups = s.visible_groups();
     let emails: usize = groups.iter().map(|g| g.ids.len()).sum();
-    let gone: Vec<&Group> = groups.iter().filter(|g| g.verdict() == Some(Verdict::Delete)).collect();
+    let gone: Vec<&Group> = groups
+        .iter()
+        .filter(|g| g.verdict() == Some(Verdict::Delete))
+        .collect();
     let go_emails: usize = gone.iter().map(|g| g.ids.len()).sum();
     let go_keys: Vec<String> = gone.iter().map(|g| g.key.clone()).collect();
     let selecting = *s.selecting.read();
@@ -163,47 +184,50 @@ fn MapHeader() -> Element {
                 h1 { "{title}" }
                 p { "{sub}" }
             }
-            div { class: "legend", role: "group", "aria-label": "Show by verdict",
-                button {
-                    class: if filter == Filter::All { "lg on" } else { "lg" },
-                    onclick: move |_| show(s, Filter::All),
-                    "All"
-                }
-                for v in Verdict::ALL {
+            // Fixed row under the title: the filter never moves, actions sit at the right.
+            div { class: "map-bar",
+                div { class: "legend", role: "group", "aria-label": "Show by verdict",
                     button {
-                        class: if filter == Filter::Verdict(v) { "lg on" } else { "lg" },
-                        onclick: move |_| show(s, Filter::Verdict(v)),
-                        span { class: "mark mark-{v.as_str()}",
-                            span { class: "vs" }
-                            "{by_verdict.get(&v).copied().unwrap_or(0)} {v.label().to_lowercase()}"
+                        class: if filter == Filter::All { "lg on" } else { "lg" },
+                        onclick: move |_| show(s, Filter::All),
+                        "All"
+                    }
+                    for v in Verdict::ALL {
+                        button {
+                            class: if filter == Filter::Verdict(v) { "lg on" } else { "lg" },
+                            onclick: move |_| show(s, Filter::Verdict(v)),
+                            span { class: "mark mark-{v.as_str()}",
+                                span { class: "vs" }
+                                "{by_verdict.get(&v).copied().unwrap_or(0)} {v.label().to_lowercase()}"
+                            }
                         }
                     }
                 }
-            }
-            div { class: "map-actions",
-                if !go_keys.is_empty() && !selecting {
+                div { class: "map-actions",
+                    if !go_keys.is_empty() && !selecting {
+                        button {
+                            class: "btn danger",
+                            onclick: move |_| {
+                                s.selecting.set(true);
+                                s.selected_groups.write().extend(go_keys.iter().cloned());
+                            },
+                            {icon("trash")}
+                            "Select {go_emails} that can go"
+                        }
+                    }
                     button {
-                        class: "btn danger",
+                        class: if selecting { "btn primary" } else { "btn" },
+                        title: "Pick blocks to trash (Esc to leave)",
                         onclick: move |_| {
-                            s.selecting.set(true);
-                            s.selected_groups.write().extend(go_keys.iter().cloned());
+                            let on = !*s.selecting.peek();
+                            s.selecting.set(on);
+                            if !on {
+                                s.selected_groups.write().clear();
+                            }
                         },
-                        {icon("trash")}
-                        "Select {go_emails} that can go"
+                        {icon("check")}
+                        if selecting { "Done" } else { "Select" }
                     }
-                }
-                button {
-                    class: if selecting { "btn primary" } else { "btn" },
-                    title: "Pick blocks to trash (Esc to leave)",
-                    onclick: move |_| {
-                        let on = !*s.selecting.peek();
-                        s.selecting.set(on);
-                        if !on {
-                            s.selected_groups.write().clear();
-                        }
-                    },
-                    {icon("check")}
-                    if selecting { "Done" } else { "Select" }
                 }
             }
         }
@@ -243,7 +267,11 @@ fn Tile(block: Block, rect: Rect, selecting: bool, selected: bool) -> Element {
     } else {
         ""
     };
-    let hatch = if block.n > 0 { block.go * 100 / block.n } else { 0 };
+    let hatch = if block.n > 0 {
+        block.go * 100 / block.n
+    } else {
+        0
+    };
     let can_pick = !block.keys.is_empty();
     let is_group = matches!(block.target, Target::Group(_));
     let verdict = match &block.target {
@@ -331,7 +359,13 @@ fn SelectionBar() -> Element {
     if picked.is_empty() {
         return rsx! {};
     }
-    let emails: usize = s.groups.read().iter().filter(|g| picked.contains(&g.key)).map(|g| g.ids.len()).sum();
+    let emails: usize = s
+        .groups
+        .read()
+        .iter()
+        .filter(|g| picked.contains(&g.key))
+        .map(|g| g.ids.len())
+        .sum();
     rsx! {
         div { class: "selection-bar",
             b { "{picked.len()} groups, {emails} emails selected" }
@@ -361,7 +395,10 @@ fn Empty() -> Element {
     let (heading, text) = if !s.query.read().trim().is_empty() {
         ("No matches", "Nothing matches your search.")
     } else if *s.unanalyzed.read() > 0 {
-        ("Reading your inbox…", "Blocks appear here as emails are sorted.")
+        (
+            "Reading your inbox…",
+            "Blocks appear here as emails are sorted.",
+        )
     } else if s.groups.read().is_empty() {
         ("No emails yet", "Press Sync to fetch and sort your inbox.")
     } else {

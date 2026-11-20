@@ -28,6 +28,7 @@ use dioxus::prelude::*;
 use crate::db::{self, Email};
 use crate::google;
 use crate::groups::{self, Group, Verdict};
+use crate::icons;
 use crate::queue::{self, Job, Kind};
 use crate::sync::{self, Stage};
 
@@ -410,19 +411,24 @@ pub fn App() -> Element {
     }
 
     let open = s.open.read().clone();
-    let reading = open.is_some();
     rsx! {
         div { class: "app", tabindex: "0", autofocus: true, onkeydown: move |e| on_key(s, e),
             topbar::TopBar {}
             overlays::ErrorBanner {}
             if s.showing_emails() {
-                main { class: if reading { "content reading" } else { "content" },
+                // Always two panes, so opening an email doesn't reflow the list.
+                main { class: "content",
                     section { class: "list-pane",
                         list::EmailToolbar {}
                         list::EmailList {}
                     }
                     if let Some(id) = open {
                         reader::Reader { key: "{id}" }
+                    } else {
+                        div { class: "reader-empty",
+                            span { class: "empty-icon", {icons::icon("mail")} }
+                            "Select an email to read it"
+                        }
                     }
                 }
             } else {

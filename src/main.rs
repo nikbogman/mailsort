@@ -71,7 +71,8 @@ fn main() {
     let head = format!(
         r#"<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
-<style>{}</style>"#,
+<style>{}</style>
+<script>try{{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>"#,
         include_str!("../assets/style.css")
     );
     let window = WindowBuilder::new()
@@ -79,6 +80,7 @@ fn main() {
         .with_window_icon(app_icon())
         .with_inner_size(LogicalSize::new(1320.0, 860.0))
         .with_min_inner_size(LogicalSize::new(900.0, 560.0));
-    let config = Config::new().with_window(window).with_menu(None).with_custom_head(head);
+    // A fixed webview profile, so localStorage (the theme) survives restarts.
+    let config = Config::new().with_data_directory(config::DATA_DIR.join("webview")).with_window(window).with_menu(None).with_custom_head(head);
     dioxus::LaunchBuilder::desktop().with_cfg(config).launch(ui::App);
 }
