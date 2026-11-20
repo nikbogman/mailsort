@@ -400,7 +400,8 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 }
 
 /* Theme switch shows the theme you'd switch to. */
+.theme-btn span { display: flex; } /* inline spans sat on the text baseline */
 .theme-btn .sun { display: none; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .theme-btn .sun { display: block; } :root:not([data-theme="light"]) .theme-btn .moon { display: none; } }
-:root[data-theme="dark"] .theme-btn .sun { display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .theme-btn .sun { display: flex; } :root:not([data-theme="light"]) .theme-btn .moon { display: none; } }
+:root[data-theme="dark"] .theme-btn .sun { display: flex; }
 :root[data-theme="dark"] .theme-btn .moon { display: none; }
