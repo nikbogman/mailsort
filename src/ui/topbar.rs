@@ -9,7 +9,7 @@ use crate::icons::icon;
 use crate::sync::{self, Stage};
 
 /// The app icon at small size: a tiny inbox map (same drawing as the window icon in main.rs).
-/// Large renders (assets/icon.svg) hatch the red part instead, as in the design.
+/// Large renders (assets/logo.svg) hatch the red part instead, as in the design.
 pub fn logo() -> Element {
     rsx! {
         svg { class: "logo", width: "22", height: "22", view_box: "0 0 64 64", "aria-hidden": "true",

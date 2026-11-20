@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/icon.svg" width="96" height="96" alt="mailsort icon">
+<img src="assets/logo.svg" width="96" height="96" alt="mailsort icon">
 
 # mailsort
 
