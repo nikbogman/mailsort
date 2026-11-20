@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inbox map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>
+body{margin:0}
+.mp{font-family:Figtree,system-ui,sans-serif;font-size:14px;line-height:1.45;color:#1b1d22;background:#f7f7f5;min-height:900px}
+.ib,label{border-radius:6px}
+.tile{border-radius:8px}
+.tile>span:not(.hatch):not(.soon):not(.cb){background-color:inherit;align-self:flex-start;padding:1px 6px;margin-left:-6px;border-radius:4px}
+.hatch{opacity:0.75}
+.tile.dim{opacity:0.7}
+.vs{border-radius:3px}
+.hd{font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-0.02em}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.ib{width:34px;height:34px;display:grid;place-items:center;background:transparent;border:1px solid transparent;color:#5d6270;cursor:pointer}
+.ib:hover{border-color:#d9d9d4;color:#1b1d22}
+.vs{width:10px;height:10px;box-sizing:border-box;display:inline-block;flex:none}
+.vs.go{background:#d93636}
+.vs.rv{border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.vs.kp{border:1.5px solid currentColor}
+.map{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(8,74px);gap:3px}
+.tile{position:relative;overflow:hidden;padding:12px;display:flex;flex-direction:column;gap:2px;color:#1b1d22;text-decoration:none;box-sizing:border-box}
+.tile:hover{outline:2px solid #1b1d22;outline-offset:-2px}
+.tile .nm{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;white-space:nowrap;position:relative}
+.tile .ct{position:relative;font-size:13px;color:#3d414b}
+.hatch{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,rgb(217 54 54 / 0.45) 0 2px,transparent 2px 7px);border-top:2px solid #d93636}
+</style></helmet>
+<div class="mp">
+<header class="wrap" style="display: flex; align-items: center; gap: 12px; min-height: 64px; flex-wrap: wrap">
+<span class="hd" style="font-weight: 700; font-size: 18px">mailsort</span>
+<span style="color: #9b9fa8">/</span><span style="font-weight: 500">All mail</span>
+<span style="flex: 1"></span>
+<label style="display: flex; align-items: center; gap: 8px; height: 34px; width: 260px; max-width: 100%; padding: 0 10px; border: 1px solid #d9d9d4; background: #fff; color: #5d6270; box-sizing: border-box">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input type="search" placeholder="Search" aria-label="Search" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; color: #1b1d22">
+</label>
+<a class="ib" href="Mp-Select.dc.html" aria-label="Select blocks"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path d="m14 17 2 2 4-4"/></svg></a>
+<a class="ib" href="Mp-Sync.dc.html" aria-label="Sync now"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-5L4 8M4 4v4h4M4 13a8 8 0 0 0 14 5l2-2M20 20v-4h-4"/></svg></a>
+<a class="ib" href="Mp-Trash.dc.html" aria-label="Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v4H3zM5 9v10h14V9M10 13h4"/></svg></a>
+<a class="ib" href="Sp-Settings.dc.html" aria-label="Settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a>
+</header>
+
+<main class="wrap" style="padding-top: 20px; padding-bottom: 40px">
+<div style="display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 18px">
+<div style="flex: 1; min-width: 260px">
+<h1 class="hd" style="margin: 0; font-size: 34px; font-weight: 700; line-height: 1.1">Where your mail is</h1>
+<p style="margin: 6px 0 0; color: #5d6270">Each block is a category, sized by how many emails it holds. The red hatching is what can go.</p>
+</div>
+<div style="display: flex; gap: 18px; font-size: 13px; flex-wrap: wrap">
+<span style="display: inline-flex; align-items: center; gap: 8px; color: #b42323; font-weight: 600"><span class="vs go"></span>312 can go</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span class="vs rv"></span>38 review</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span class="vs kp"></span>895 keep</span>
+</div>
+</div>
+
+<div class="map" role="list" aria-label="Categories by size">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="14">
+<a class="tile" role="listitem" href="Mp-Category.dc.html" style="grid-column: {{t.c}}; grid-row: {{t.r}}; background: {{t.bg}}" aria-label="{{t.name}}, {{t.n}} emails, {{t.go}} can go">
+<span class="hatch" style="height: {{t.h}}"></span>
+<span class="nm"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{t.fg}}"><path d="{{t.icon}}"/></svg>{{t.name}}</span>
+<span class="hd" style="position: relative; font-size: {{t.fs}}; font-weight: 700; line-height: 1.05">{{t.n}}</span>
+<span class="ct">{{t.goText}}</span>
+</a>
+</sc-for>
+</div>
+
+<div style="display: flex; gap: 24px; margin-top: 16px; font-size: 13px; color: #3d414b; flex-wrap: wrap">
+<sc-for list="{{legend}}" as="l" hint-placeholder-count="4">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 14px; height: 14px; background: {{l.bg}}; outline: 1px solid {{l.fg}}"></span>{{l.name}}</span>
+</sc-for>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = { imp: ['#dfe8fb', '#2f63c9', 'Important'], dev: ['#d6f1ec', '#13867a', 'Dev & services'], upd: ['#e9e1fb', '#6f4fd0', 'Updates'], low: ['#efe7d8', '#8a7552', 'Low priority'] };
+    const I = {
+      heart: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', work: 'M3 8h18v11H3zM8 8V5h8v3M3 13h18',
+      admin: 'M3 21h18M5 21V10M19 21V10M9 21v-7h6v7M2 10l10-6 10 6', sec: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+      rec: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6', dev: 'M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14', alert: 'M3 12h4l3-8 4 16 3-8h4',
+      cloud: 'M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z', cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', social: 'M4 5h16v11H9l-5 4z',
+      bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4', news: 'M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5',
+      tag: 'M3 12V4h8l10 10-8 8zM7.5 7.5h.01', ban: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM5.6 5.6l12.8 12.8'
+    };
+    const t = (g, name, icon, n, go, c, r, big) => ({
+      bg: G[g][0], fg: G[g][1], name, icon, n, go, c, r,
+      h: Math.round(go / n * 100) + '%', fs: big ? '40px' : '20px', goText: go ? go + ' can go' : 'nothing to clear'
+    });
+    return {
+      tiles: [
+        t('low', 'Newsletters', I.news, 312, 186, '1 / 6', '1 / 6', true),
+        t('dev', 'Dev Tools', I.dev, 210, 129, '6 / 10', '1 / 5', true),
+        t('low', 'Promotions', I.tag, 186, 170, '10 / 13', '1 / 6', true),
+        t('low', 'Spam', I.ban, 105, 105, '1 / 4', '6 / 9', false),
+        t('upd', 'Social', I.social, 97, 52, '4 / 6', '6 / 9', false),
+        t('upd', 'Notifications', I.bell, 76, 30, '6 / 8', '5 / 8', false),
+        t('imp', 'Work', I.work, 61, 0, '8 / 10', '5 / 7', false),
+        t('imp', 'Security', I.sec, 33, 6, '8 / 10', '7 / 8', false),
+        t('dev', 'Alerts', I.alert, 22, 14, '8 / 10', '8 / 9', false),
+        t('imp', 'Personal', I.heart, 24, 0, '6 / 8', '8 / 9', false),
+        t('imp', 'Receipts', I.rec, 48, 0, '10 / 12', '6 / 8', false),
+        t('dev', 'Services', I.cloud, 39, 21, '12 / 13', '6 / 9', false),
+        t('imp', 'Admin', I.admin, 18, 0, '10 / 11', '8 / 9', false),
+        t('upd', 'Events', I.cal, 14, 11, '11 / 12', '8 / 9', false)
+      ],
+      legend: Object.values(G).map(g => ({ bg: g[0], fg: g[1], name: g[2] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

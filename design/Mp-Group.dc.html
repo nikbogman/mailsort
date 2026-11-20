@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map group with preview</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./mp.css">
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>body{margin:0}
+.er{display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:12px;padding:10px 12px;border-bottom:1px solid #e3e3de;color:#1b1d22;text-decoration:none}
+.er:hover{background:#fff}
+.er.on{background:#fff;box-shadow:inset 3px 0 0 #8a7552}
+.fact{display:flex;flex-direction:column;padding-right:24px}
+.fact b{font-size:17px;font-weight:600}</style></helmet>
+<div class="mp" style="display: flex; flex-direction: column">
+<header class="top" style="padding: 0 32px; border-bottom: 1px solid #e3e3de">
+<a href="Map.dc.html" class="hd" style="font-weight: 700; font-size: 18px; text-decoration: none">mailsort</a>
+<nav class="crumb" aria-label="Breadcrumb" style="margin-left: 8px"><span>/</span><a href="Map.dc.html">All mail</a><span>/</span><a href="Mp-Category.dc.html" style="color: #8a7552">Newsletters</a><span>/</span><span style="color: #1b1d22; font-weight: 500">Medium</span></nav>
+<span style="flex: 1"></span>
+<a class="ib" href="Mp-Trash.dc.html" aria-label="Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v4H3zM5 9v10h14V9M10 13h4"/></svg></a>
+</header>
+<div style="flex: 1; display: flex; flex-wrap: wrap">
+<section style="flex: 1 1 420px; max-width: 520px; border-right: 1px solid #e3e3de; box-sizing: border-box" aria-label="Group">
+<div style="background: #efe7d8; padding: 24px 28px; position: relative; overflow: hidden; border-radius: 8px; margin: 16px 16px 0">
+<span class="hatch" style="height: 100%; opacity: 0.15" aria-hidden="true"></span>
+<div style="position: relative">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b5a3e"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></svg>Newsletters</div>
+<h1 class="hd" style="margin: 8px 0 0; font-size: 34px; font-weight: 700; line-height: 1.05">Medium</h1>
+<div style="font-size: 18px; color: #3d414b">Daily Digest</div>
+<div style="display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 4px 10px; border-radius: 6px; background: #fff; color: #b42323; font-weight: 600; font-size: 13px"><span class="vs go"></span>All 142 can go</div>
+</div>
+</div>
+<div style="padding: 20px 28px; display: flex; flex-direction: column; gap: 16px">
+<p style="margin: 0; font-size: 15px">Daily article picks from Medium. You haven’t opened one since July, and nothing in them asks for a reply.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 0"><div class="fact"><span class="mut">Per day</span><b>1</b></div><div class="fact"><span class="mut">Opened</span><b>0 since Jul</b></div><div class="fact"><span class="mut">Since</span><b>Mar 2025</b></div></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button class="btn red" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Trash 142<span class="key">D</span></button>
+<button class="btn" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M9 5h10v10M5 9v10h10"/></svg>Unsubscribe</button>
+<button class="btn ghost" type="button">Keep<span class="key">K</span></button>
+</div>
+</div>
+<div style="border-top: 1px solid #e3e3de">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<a class="er {{r.on}}" href="Mp-Group.dc.html"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap"><b style="font-weight: 600">{{r.subj}}</b></span><span class="mut" style="text-align: right; font-size: 13px">{{r.d}}</span></a>
+</sc-for>
+</div>
+</section>
+
+<article style="flex: 999 1 420px; min-width: 0; padding: 28px 36px; box-sizing: border-box" aria-label="Email preview">
+<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+<span style="width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; background: #8a7552; color: #fff; font-weight: 700">M</span>
+<span style="display: flex; flex-direction: column"><b>Medium Daily Digest</b><span class="mut" style="font-size: 13px">noreply@medium.com</span></span>
+<span style="flex: 1"></span><span class="mut">Today, 07:12</span>
+</div>
+<h2 class="hd" style="margin: 20px 0 0; font-size: 24px; font-weight: 700">The quiet death of the side project</h2>
+<div style="margin-top: 20px; background: #fff; border: 1px solid #e3e3de; border-radius: 8px; padding: 28px; display: flex; flex-direction: column; gap: 18px; max-width: 620px">
+<div style="height: 140px; border-radius: 6px; background: repeating-linear-gradient(45deg, #ece3d2 0 10px, #f3ede2 10px 20px); display: grid; place-items: center; color: #8a7552; font-size: 13px">Image hidden</div>
+<b style="font-size: 18px">The quiet death of the side project</b>
+<span class="mut">Why most weekend projects stall at 80%, and the three habits that get them shipped.</span>
+<span style="height: 1px; background: #e3e3de"></span>
+<b>Rust for the impatient</b>
+<span class="mut">A tour of ownership in fifteen minutes.</span>
+</div>
+</article>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = (subj, d, on) => ({ subj, d, on: on ? 'on' : '' });
+    return { rows: [
+      r('The quiet death of the side project', 'Today', true), r('Rust for the impatient', 'Nov 19'), r('Why your standups feel useless', 'Nov 18'),
+      r('A field guide to burnout', 'Nov 17'), r('Designing for the second click', 'Nov 16'), r('The case against microservices, again', 'Nov 15')
+    ]};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 //! App state, data loading, and the root component.
 //!
-//! Home is the overview: emails grouped by (organization, topic), each group with a summary and
+//! Home is the map: a treemap of categories, then of groups (organization, topic), each group with a summary and
 //! verdict. Opening a group (or Trash) shows its emails with the reader.
 //!
 //! Updates while you look at the screen: cards keep their place (`order`); new groups found by a
@@ -8,16 +8,19 @@
 
 mod format;
 mod list;
+mod map;
 mod overlays;
-mod overview;
 mod reader;
 mod setup;
-mod sidebar;
+mod topbar;
+mod treemap;
 
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant};
+use std::time::Duration;
+
+use web_time::Instant;
 
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
@@ -69,6 +72,8 @@ pub struct State {
     pub loading: Signal<bool>,
     pub selected: Signal<HashSet<String>>,
     pub selected_groups: Signal<HashSet<String>>,
+    /// Map select mode: clicking a block selects what can go instead of opening it.
+    pub selecting: Signal<bool>,
     /// Email open in the reader.
     pub open: Signal<Option<String>>,
     pub query: Signal<String>,
@@ -284,6 +289,7 @@ fn show(mut s: State, filter: Filter) {
     s.filter.set(filter);
     s.group.set(None);
     s.open.set(None);
+    s.selecting.set(false);
     s.clear_selection();
     // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
     let cached = if trash { s.trash_cache.peek().clone() } else { None };
@@ -347,7 +353,7 @@ fn ask_delete(mut s: State, ids: Vec<String>) {
     }
 }
 
-/// Email totals per verdict and per category, for the sidebar and overview header.
+/// Email totals per verdict and per category, for the map header.
 fn totals(groups: &[Group]) -> (HashMap<Verdict, usize>, HashMap<String, usize>) {
     let mut by_verdict = HashMap::new();
     let mut by_category = HashMap::new();
@@ -374,6 +380,7 @@ pub fn App() -> Element {
         loading: use_signal(|| false),
         selected: use_signal(HashSet::new),
         selected_groups: use_signal(HashSet::new),
+        selecting: use_signal(|| false),
         open: use_signal(|| None),
         query: use_signal(String::new),
         jobs: use_signal(Vec::new),
@@ -406,24 +413,20 @@ pub fn App() -> Element {
     let reading = open.is_some();
     rsx! {
         div { class: "app", tabindex: "0", autofocus: true, onkeydown: move |e| on_key(s, e),
-            sidebar::Sidebar {}
-            main { class: if reading { "content reading" } else { "content" },
-                if s.showing_emails() {
+            topbar::TopBar {}
+            overlays::ErrorBanner {}
+            if s.showing_emails() {
+                main { class: if reading { "content reading" } else { "content" },
                     section { class: "list-pane",
                         list::EmailToolbar {}
-                        overlays::ErrorBanner {}
                         list::EmailList {}
                     }
                     if let Some(id) = open {
                         reader::Reader { key: "{id}" }
                     }
-                } else {
-                    section { class: "list-pane",
-                        overview::OverviewToolbar {}
-                        overlays::ErrorBanner {}
-                        overview::Overview {}
-                    }
                 }
+            } else {
+                main { class: "map-scroll", map::MapView {} }
             }
         }
         overlays::Queue {}
@@ -439,10 +442,12 @@ fn on_key(mut s: State, e: Event<KeyboardData>) {
         return;
     }
     match e.key() {
-        // Esc steps back one level: reader, then selection, then group.
+        // Esc steps back one level: reader, selection, select mode, group, then up the map.
         Key::Escape if s.open.peek().is_some() => s.open.set(None),
         Key::Escape if s.has_selection() => s.clear_selection(),
+        Key::Escape if *s.selecting.peek() => s.selecting.set(false),
         Key::Escape if s.group.peek().is_some() => close_group(s),
+        Key::Escape if *s.filter.peek() != Filter::All => show(s, Filter::All),
         Key::Delete if e.modifiers().contains(Modifiers::SHIFT) || s.in_trash_peek() => ask_delete(s, s.targets()),
         Key::Delete => queue::enqueue(s, Kind::Trash, s.targets()),
         Key::Character(c) if c == "/" => {

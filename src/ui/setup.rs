@@ -24,6 +24,7 @@ pub fn Setup(on_ready: EventHandler) -> Element {
                     button {
                         class: "btn",
                         onclick: move |_| {
+                            #[cfg(not(target_arch = "wasm32"))]
                             let _ = open::that(&*DATA_DIR);
                         },
                         "Open folder"

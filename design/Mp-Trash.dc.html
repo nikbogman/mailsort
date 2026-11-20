@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map trash</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./mp.css">
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>body{margin:0}
+.map{grid-template-rows:repeat(5,64px)}
+.soon{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,rgb(27 29 34 / 0.35) 0 2px,transparent 2px 6px);border-top:2px solid #1b1d22}
+.tr{display:grid;grid-template-columns:16px minmax(140px,1fr) minmax(200px,2fr) 100px 100px;gap:14px;align-items:center;min-height:44px;border-bottom:1px solid #e3e3de;min-width:640px}</style></helmet>
+<div class="mp">
+<header class="wrap top">
+<a href="Map.dc.html" class="hd" style="font-weight: 700; font-size: 18px; text-decoration: none">mailsort</a>
+<span style="color: #9b9fa8">/</span><span style="font-weight: 500">Trash</span>
+<span style="flex: 1"></span>
+<a class="ib" href="Map.dc.html" aria-label="Back to map"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></a>
+<a class="ib on" href="Mp-Trash.dc.html" aria-label="Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v4H3zM5 9v10h14V9M10 13h4"/></svg></a>
+</header>
+
+<main class="wrap" style="padding-top: 12px; padding-bottom: 100px">
+<div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px">
+<div style="flex: 1; min-width: 260px">
+<h1 class="hd" style="margin: 0; font-size: 34px; font-weight: 700; line-height: 1.1">Trash</h1>
+<p style="margin: 6px 0 0" class="mut">186 emails. The dark hatching at the bottom of each block leaves for good this week.</p>
+</div>
+<button class="btn" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6L4 9M4 4v5h5"/></svg>Restore all</button>
+<a class="btn red" href="Sp-Confirm.dc.html">Empty Trash</a>
+</div>
+
+<div class="map" role="list" aria-label="Trash by category">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="6">
+<div class="tile" role="listitem" style="grid-column: {{t.c}}; grid-row: {{t.r}}; background: {{t.bg}}">
+<span class="soon" style="height: {{t.h}}"></span>
+<span class="nm"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{t.fg}}"><path d="{{t.icon}}"/></svg>{{t.name}}</span>
+<span class="hd" style="position: relative; font-size: 24px; font-weight: 700">{{t.n}}</span>
+<span class="ct">{{t.soon}} leave this week</span>
+</div>
+</sc-for>
+</div>
+
+<h2 class="hd" style="margin: 28px 0 8px; font-size: 18px; font-weight: 700">Leaving first</h2>
+<div style="overflow-x: auto; border-top: 1px solid #e3e3de">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div class="tr">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.fg}}"><path d="{{r.icon}}"/></svg>
+<b style="font-weight: 600">{{r.from}}</b>
+<span class="mut" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{r.subj}}</span>
+<span style="color: #b42323; font-size: 13px; font-weight: 600">{{r.left}}</span>
+<button class="btn ghost" type="button" style="justify-self: end"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6L4 9M4 4v5h5"/></svg>Restore</button>
+</div>
+</sc-for>
+</div>
+</main>
+
+<div style="position: absolute; left: 24px; bottom: 24px" aria-live="polite">
+<div class="toast" style="flex-direction: column; align-items: stretch; gap: 8px">
+<div style="display: flex; align-items: center; gap: 12px"><span class="vs go"></span>Moved 590 to Trash<a href="Mp-Select.dc.html">Undo</a></div>
+<div style="height: 3px; background: #3d414b"><span style="display: block; width: 60%; height: 100%; background: #f7f7f5"></span></div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = { dev: ['#e3f2ef', '#13867a'], upd: ['#ede7f8', '#6f4fd0'], low: ['#f1ece2', '#8a7552'] };
+    const I = { dev: 'M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14', social: 'M4 5h16v11H9l-5 4z', cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', news: 'M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5', tag: 'M3 12V4h8l10 10-8 8zM7.5 7.5h.01', ban: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM5.6 5.6l12.8 12.8' };
+    const t = (g, name, icon, n, soon, c, r) => ({ bg: G[g][0], fg: G[g][1], name, icon, n, soon, c, r, h: Math.max(4, Math.round(soon / n * 100)) + '%' });
+    const row = (g, icon, from, subj, left) => ({ fg: G[g][1], icon, from, subj, left });
+    return {
+      tiles: [
+        t('low', 'Newsletters', I.news, 70, 12, '1 / 6', '1 / 6'),
+        t('low', 'Promotions', I.tag, 52, 9, '6 / 10', '1 / 5'),
+        t('dev', 'Dev Tools', I.dev, 30, 2, '10 / 13', '1 / 4'),
+        t('upd', 'Social', I.social, 20, 5, '10 / 13', '4 / 6'),
+        t('upd', 'Events', I.cal, 8, 3, '6 / 8', '5 / 6'),
+        t('low', 'Spam', I.ban, 6, 6, '8 / 10', '5 / 6')
+      ],
+      rows: [
+        row('low', I.tag, 'Uber Eats', '30% off your next 3 orders', 'Today'),
+        row('upd', I.social, 'Discord', 'Catch up on #general', '2 days left'),
+        row('low', I.tag, 'Spotify', 'New music Friday is here', '3 days left'),
+        row('upd', I.cal, 'Zoom', 'Webinar: Scaling async teams', '6 days left')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -264,6 +264,7 @@ pub fn clean_reason(reason: &str) -> String {
 }
 
 /// Starts `ollama serve` if nothing answers, then waits for it.
+#[cfg(not(target_arch = "wasm32"))]
 pub async fn ensure_ollama() -> Result<(), String> {
     let client = reqwest::Client::builder().timeout(Duration::from_secs(2)).build().map_err(|e| e.to_string())?;
     let up = || async { client.get(format!("{}/api/tags", ollama_url())).send().await.is_ok() };
@@ -279,7 +280,7 @@ pub async fn ensure_ollama() -> Result<(), String> {
     }
     cmd.spawn().map_err(|_| "Ollama isn't installed or not on PATH".to_string())?;
     for _ in 0..30 {
-        tokio::time::sleep(Duration::from_millis(500)).await;
+        crate::sleep(Duration::from_millis(500)).await;
         if up().await {
             return Ok(());
         }

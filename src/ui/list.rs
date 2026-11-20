@@ -2,10 +2,11 @@
 
 use dioxus::prelude::*;
 
-use super::format::{avatar, check, fmt_date, sender_name};
-use super::overview::verdict_chip;
+use super::format::{avatar, check, fmt_date, fmt_range, sender_name};
+use super::map::{hue, verdict_mark};
 use super::{State, ask_delete, close_group};
 use crate::db::Email;
+use crate::groups::Verdict;
 use crate::icons::icon;
 use crate::queue::{self, Kind};
 
@@ -108,24 +109,34 @@ pub fn EmailToolbar() -> Element {
                     }
                 }
             }
-            SearchBox {}
         }
     }
 }
 
-/// The open group's summary and verdict, above its emails.
+/// The open group's header: category colour, verdict, summary and the span it covers.
 #[component]
 fn GroupSummary() -> Element {
     let s = use_context::<State>();
     let Some(g) = s.open_group() else { return rsx! {} };
-    let Some(sum) = g.summary.clone() else { return rsx! {} };
+    let h = hue(&g.category);
     rsx! {
-        div { class: "group-summary verdict-bg-{sum.verdict.as_str()}",
-            {verdict_chip(Some(sum.verdict), &sum.reason)}
-            div {
-                div { class: "summary", "{sum.summary}" }
+        div { class: "group-head hue-{h}",
+            if g.verdict() == Some(Verdict::Delete) {
+                span { class: "gh-hatch" }
+            }
+            div { class: "gh-cat fg-{h}", {icon(&g.category)} "{g.category}" }
+            h2 { "{g.org}" }
+            if !g.topic.is_empty() {
+                div { class: "gh-topic", "{g.topic}" }
+            }
+            div { class: "gh-meta",
+                {verdict_mark(g.verdict())}
+                span { "{g.ids.len()} emails, {fmt_range(&g.first, &g.last)}" }
+            }
+            if let Some(sum) = &g.summary {
+                p { class: "summary", "{sum.summary}" }
                 if !sum.reason.is_empty() {
-                    div { class: "reason", "{sum.reason}" }
+                    p { class: "reason", "{sum.reason}" }
                 }
             }
         }

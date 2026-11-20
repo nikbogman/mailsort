@@ -1,0 +1,25 @@
+# Push a tag like v0.2.0 (matching Cargo.toml's version) to publish mailsort.exe.
+# Installed apps see the release on their next start and offer "Update to v0.2.0".
+name: release
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # A tag newer than the built version would make apps update forever.
+      - name: Tag matches Cargo.toml
+        shell: bash
+        run: test "${GITHUB_REF_NAME#v}" = "$(cargo pkgid | sed 's/.*[#@]//')"
+      - run: cargo build --release
+      - run: gh release create "$env:GITHUB_REF_NAME" target/release/mailsort.exe --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

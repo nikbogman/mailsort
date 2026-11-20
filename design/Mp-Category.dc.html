@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map inside a category</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./mp.css">
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>body{margin:0}</style></helmet>
+<div class="mp">
+<header class="wrap top">
+<a href="Map.dc.html" class="hd" style="font-weight: 700; font-size: 18px; text-decoration: none">mailsort</a>
+<nav class="crumb" aria-label="Breadcrumb" style="margin-left: 8px"><span>/</span><a href="Map.dc.html">All mail</a><span>/</span><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: #8a7552"><path d="M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></svg><span style="color: #1b1d22; font-weight: 500">Newsletters</span></nav>
+<span style="flex: 1"></span>
+<label class="srch"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search Newsletters" aria-label="Search Newsletters"></label>
+<a class="ib" href="Mp-Trash.dc.html" aria-label="Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v4H3zM5 9v10h14V9M10 13h4"/></svg></a>
+</header>
+
+<main class="wrap" style="padding-top: 20px; padding-bottom: 40px">
+<div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 18px">
+<div style="flex: 1; min-width: 260px">
+<h1 class="hd" style="margin: 0; font-size: 34px; font-weight: 700; line-height: 1.1">Newsletters</h1>
+<p style="margin: 6px 0 0" class="mut">312 emails from 8 senders. Low priority group.</p>
+</div>
+<a class="btn" href="Map.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Back to map<span class="key">Esc</span></a>
+<a class="btn red" href="Mp-Select.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Trash 196 that can go</a>
+</div>
+
+<div class="map" role="list" aria-label="Senders in Newsletters by size">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="8">
+<a class="tile" role="listitem" href="Mp-Group.dc.html" style="grid-column: {{t.c}}; grid-row: {{t.r}}; background: {{t.bg}}" aria-label="{{t.name}}, {{t.n}} emails, {{t.vl}}">
+<span class="hatch" style="height: {{t.h}}"></span>
+<span class="nm">{{t.name}}</span>
+<span class="ct">{{t.topic}}</span>
+<span class="hd" style="position: relative; font-size: {{t.fs}}; font-weight: 700; line-height: 1.1; margin-top: auto">{{t.n}}</span>
+<span class="ct" style="display: inline-flex; align-items: center; gap: 6px"><span class="vs {{t.v}}"></span>{{t.vl}}</span>
+</a>
+</sc-for>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const V = { go: 'Can go', rv: 'Review', kp: 'Keep' };
+    const t = (name, topic, n, v, bg, c, r, big) => ({ name, topic, n, v, vl: V[v], bg, c, r, h: v === 'go' ? '100%' : '0%', fs: big ? '48px' : '22px' });
+    return { tiles: [
+      t('Medium', 'Daily Digest', 142, 'go', '#efe7d8', '1 / 7', '1 / 8', true),
+      t('This Week in Rust', 'Weekly issue', 48, 'kp', '#e6dac3', '7 / 10', '1 / 6', true),
+      t('Substack', 'Platformer', 31, 'rv', '#f3ede2', '10 / 13', '1 / 4', false),
+      t('Morning Brew', 'Daily', 27, 'go', '#ebe1cd', '10 / 13', '4 / 7', false),
+      t('Hacker Newsletter', 'Weekly', 22, 'kp', '#f1eadc', '7 / 10', '6 / 9', false),
+      t('Product Hunt', 'Daily digest', 18, 'go', '#e9dfca', '10 / 13', '7 / 9', false),
+      t('Dense Discovery', 'Weekly', 14, 'kp', '#ece3d2', '1 / 5', '8 / 9', false),
+      t('3 others', 'Mixed', 10, 'go', '#f3ede2', '5 / 7', '8 / 9', false)
+    ]};
+  }
+}
+</script>
+</body>
+</html>

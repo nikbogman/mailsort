@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map syncing</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./mp.css">
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>body{margin:0}
+.uns{background:repeating-linear-gradient(-45deg,#e3e3de 0 8px,#efefeb 8px 16px);outline:2px dashed #9b9fa8;outline-offset:-2px}</style></helmet>
+<div class="mp">
+<div style="height: 3px; background: #e3e3de" aria-hidden="true"><span style="display: block; width: 37%; height: 100%; background: #1b1d22"></span></div>
+<header class="wrap top">
+<a href="Map.dc.html" class="hd" style="font-weight: 700; font-size: 18px; text-decoration: none">mailsort</a>
+<span style="color: #9b9fa8">/</span><span style="font-weight: 500">All mail</span>
+<span style="flex: 1"></span>
+<span class="mut" style="font-size: 13px">Reading new mail with qwen2.5:3b</span>
+<button class="btn" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"/></svg>Stop</button>
+</header>
+
+<main class="wrap" style="padding-top: 20px; padding-bottom: 40px">
+<div style="margin-bottom: 18px">
+<h1 class="hd" style="margin: 0; font-size: 34px; font-weight: 700; line-height: 1.1">Sorting 380 new emails</h1>
+<p style="margin: 6px 0 0" class="mut">Blocks grow as mail is sorted. The striped block shrinks until it’s gone.</p>
+</div>
+<div class="map" role="list" aria-label="Categories while syncing">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="7">
+<a class="tile" role="listitem" href="Mp-Category.dc.html" style="grid-column: {{t.c}}; grid-row: {{t.r}}; background: {{t.bg}}">
+<span class="nm"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{t.fg}}"><path d="{{t.icon}}"/></svg>{{t.name}}</span>
+<span class="hd" style="position: relative; font-size: 22px; font-weight: 700">{{t.n}}</span>
+<sc-if value="{{t.plus}}" hint-placeholder-val="{{false}}"><span class="ct" style="color: {{t.fg}}; font-weight: 600">+{{t.plus}} new</span></sc-if>
+</a>
+</sc-for>
+<div class="tile uns" role="listitem" style="grid-column: 8 / 13; grid-row: 5 / 9; justify-content: center; align-items: center; text-align: center; gap: 6px">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 22px; height: 22px; color: #5d6270"><path d="M20 11a8 8 0 0 0-14-5L4 8M4 4v4h4M4 13a8 8 0 0 0 14 5l2-2M20 20v-4h-4"/></svg>
+<span class="nm" style="justify-content: center">Still reading</span>
+<span class="hd" style="font-size: 44px; font-weight: 700; line-height: 1">238</span>
+<span class="ct">142 of 380 done, about 4 min left</span>
+</div>
+</div>
+</main>
+
+<div style="position: absolute; left: 24px; bottom: 24px; display: flex; flex-direction: column; gap: 8px" aria-live="polite">
+<div class="toast"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>3 new groups in Dev Tools<a href="Mp-Category.dc.html">Show</a></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = { imp: ['#dfe8fb', '#2f63c9'], dev: ['#d6f1ec', '#13867a'], upd: ['#e9e1fb', '#6f4fd0'], low: ['#efe7d8', '#8a7552'] };
+    const I = { dev: 'M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14', social: 'M4 5h16v11H9l-5 4z', bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4', news: 'M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5', tag: 'M3 12V4h8l10 10-8 8zM7.5 7.5h.01', ban: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM5.6 5.6l12.8 12.8', sec: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z' };
+    const t = (g, name, icon, n, plus, c, r) => ({ bg: G[g][0], fg: G[g][1], name, icon, n, plus: plus || 0, c, r });
+    return { tiles: [
+      t('low', 'Newsletters', I.news, 341, 29, '1 / 6', '1 / 6'),
+      t('dev', 'Dev Tools', I.dev, 262, 52, '6 / 10', '1 / 5'),
+      t('low', 'Promotions', I.tag, 203, 17, '10 / 13', '1 / 5'),
+      t('low', 'Spam', I.ban, 111, 6, '1 / 4', '6 / 9'),
+      t('upd', 'Social', I.social, 106, 9, '4 / 6', '6 / 9'),
+      t('upd', 'Notifications', I.bell, 85, 9, '6 / 8', '5 / 8'),
+      t('imp', 'Important', I.sec, 204, 20, '6 / 8', '8 / 9')
+    ]};
+  }
+}
+</script>
+</body>
+</html>

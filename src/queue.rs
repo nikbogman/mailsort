@@ -3,7 +3,9 @@
 
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::time::{Duration, Instant};
+use std::time::Duration;
+
+use web_time::Instant;
 
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
@@ -105,7 +107,7 @@ async fn work(s: State) {
     while let Some(id) = next_queued(s) {
         let Some(j) = job(s, id) else { continue };
         if j.kind == Kind::Delete {
-            tokio::time::sleep((j.created + DELETE_GRACE).saturating_duration_since(Instant::now())).await;
+            crate::sleep((j.created + DELETE_GRACE).saturating_duration_since(Instant::now())).await;
             if state_of(s, id) != Some(JobState::Queued) {
                 continue; // undone during the grace period
             }
@@ -180,7 +182,7 @@ fn finish(s: State, id: u64, state: JobState) {
     update(s, id, |j| j.state = state);
     let mut jobs = s.jobs;
     spawn_forever(async move {
-        tokio::time::sleep(HIDE_AFTER).await;
+        crate::sleep(HIDE_AFTER).await;
         jobs.write().retain(|j| j.id != id);
     });
 }

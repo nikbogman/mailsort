@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map select blocks</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./mp.css">
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600&amp;display=swap"><style>body{margin:0}
+.tile .cb{position:absolute;top:10px;right:10px}
+.tile.dim{opacity:0.7}</style></helmet>
+<div class="mp">
+<header class="wrap top">
+<a href="Map.dc.html" class="hd" style="font-weight: 700; font-size: 18px; text-decoration: none">mailsort</a>
+<span style="color: #9b9fa8">/</span><span style="font-weight: 500">Select what can go</span>
+<span style="flex: 1"></span>
+<a class="btn ghost" href="Map.dc.html">Done<span class="key">Esc</span></a>
+</header>
+
+<main class="wrap" style="padding-top: 12px; padding-bottom: 110px">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px">
+<span class="mut">Click blocks to select only their hatched part. Blocks with nothing to clear are dimmed.</span>
+<span style="flex: 1"></span>
+<button class="btn" type="button">Select all hatched</button>
+</div>
+<div class="map" role="list" aria-label="Categories, selectable">
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="14">
+<a class="tile {{t.cls}}" role="listitem" href="Mp-Select.dc.html" style="grid-column: {{t.c}}; grid-row: {{t.r}}; background: {{t.bg}}" aria-label="{{t.name}}, {{t.go}} can go">
+<span class="hatch" style="height: {{t.h}}"></span>
+<sc-if value="{{t.on}}" hint-placeholder-val="{{false}}"><span class="cb on"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span></sc-if>
+<sc-if value="{{t.can}}" hint-placeholder-val="{{true}}"><sc-if value="{{t.off}}" hint-placeholder-val="{{true}}"><span class="cb"></span></sc-if></sc-if>
+<span class="nm"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{t.fg}}"><path d="{{t.icon}}"/></svg>{{t.name}}</span>
+<span class="hd" style="position: relative; font-size: {{t.fs}}; font-weight: 700; line-height: 1.05">{{t.go}}</span>
+<span class="ct">of {{t.n}}</span>
+</a>
+</sc-for>
+</div>
+</main>
+
+<div style="position: absolute; left: 0; right: 0; bottom: 0; background: #1b1d22; color: #f7f7f5">
+<div class="wrap" style="display: flex; align-items: center; gap: 12px; min-height: 68px; flex-wrap: wrap">
+<b>4 blocks, 590 emails selected</b>
+<span style="display: flex; gap: 2px; height: 10px; width: 220px" aria-hidden="true"><span style="flex: 186; background: #efe7d8"></span><span style="flex: 170; background: #efe7d8"></span><span style="flex: 105; background: #efe7d8"></span><span style="flex: 129; background: #d6f1ec"></span></span>
+<span style="flex: 1"></span>
+<a class="btn ghost" href="Mp-Select.dc.html" style="color: #c9ccd4">Clear</a>
+<a class="btn" href="Sp-Confirm.dc.html" style="background: transparent; color: #f7f7f5; border-color: #5d6270">Delete forever<span class="key">⇧ Del</span></a>
+<a class="btn red" href="Mp-Trash.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Move to Trash<span class="key">Del</span></a>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = { imp: ['#dfe8fb', '#2f63c9'], dev: ['#d6f1ec', '#13867a'], upd: ['#e9e1fb', '#6f4fd0'], low: ['#efe7d8', '#8a7552'] };
+    const I = {
+      heart: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', work: 'M3 8h18v11H3zM8 8V5h8v3M3 13h18',
+      admin: 'M3 21h18M5 21V10M19 21V10M9 21v-7h6v7M2 10l10-6 10 6', sec: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+      rec: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6', dev: 'M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14', alert: 'M3 12h4l3-8 4 16 3-8h4',
+      cloud: 'M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z', cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', social: 'M4 5h16v11H9l-5 4z',
+      bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4', news: 'M4 5h13v14H6a2 2 0 0 1-2-2zM17 9h3v8a2 2 0 0 1-2 2M8 9h5M8 13h5',
+      tag: 'M3 12V4h8l10 10-8 8zM7.5 7.5h.01', ban: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM5.6 5.6l12.8 12.8'
+    };
+    const t = (g, name, icon, n, go, c, r, big, on) => ({
+      bg: G[g][0], fg: G[g][1], name, icon, n, go, c, r, on: !!on, off: !on, can: go > 0,
+      cls: on ? 'sel' : (go === 0 ? 'dim' : ''), h: Math.round(go / n * 100) + '%', fs: big ? '40px' : '20px'
+    });
+    return { tiles: [
+      t('low', 'Newsletters', I.news, 312, 186, '1 / 6', '1 / 6', true, true),
+      t('dev', 'Dev Tools', I.dev, 210, 129, '6 / 10', '1 / 5', true, true),
+      t('low', 'Promotions', I.tag, 186, 170, '10 / 13', '1 / 6', true, true),
+      t('low', 'Spam', I.ban, 105, 105, '1 / 4', '6 / 9', false, true),
+      t('upd', 'Social', I.social, 97, 52, '4 / 6', '6 / 9', false),
+      t('upd', 'Notifications', I.bell, 76, 30, '6 / 8', '5 / 8', false),
+      t('imp', 'Work', I.work, 61, 0, '8 / 10', '5 / 7', false),
+      t('imp', 'Security', I.sec, 33, 6, '8 / 10', '7 / 8', false),
+      t('dev', 'Alerts', I.alert, 22, 14, '8 / 10', '8 / 9', false),
+      t('imp', 'Personal', I.heart, 24, 0, '6 / 8', '8 / 9', false),
+      t('imp', 'Receipts', I.rec, 48, 0, '10 / 12', '6 / 8', false),
+      t('dev', 'Services', I.cloud, 39, 21, '12 / 13', '6 / 9', false),
+      t('imp', 'Admin', I.admin, 18, 0, '10 / 11', '8 / 9', false),
+      t('upd', 'Events', I.cal, 14, 11, '11 / 12', '8 / 9', false)
+    ]};
+  }
+}
+</script>
+</body>
+</html>
