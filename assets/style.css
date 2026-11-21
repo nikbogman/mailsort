@@ -225,7 +225,6 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 .home-scroll { flex: 1; overflow: auto; min-width: 0; }
 .home { max-width: 1120px; margin: 0 auto; padding: 16px 24px 96px; }
 .home-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-.home-head h1 { margin: 0; font: 700 26px/1.15 var(--head); letter-spacing: -0.02em; }
 .home-head select.btn { padding-right: 8px; }
 .muted { color: var(--muted); }
 .pager { display: flex; align-items: center; gap: 4px; min-height: 52px; }
@@ -239,22 +238,32 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 .new-groups .btn { border-radius: 999px; box-shadow: var(--shadow); }
 
 .groups { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--panel); overflow: hidden; }
-.grow { all: unset; box-sizing: border-box; width: 100%; min-height: 46px; border-bottom: 1px solid var(--border); cursor: pointer; }
-.grow:last-child { border-bottom: 0; }
+/* A group row: one component in both layouts. Wide (paged list): one line. Narrow (reading column): stacked. */
 .grow {
-  display: grid; grid-template-columns: 16px minmax(170px, 1.2fr) minmax(200px, 2.2fr) 52px 110px 64px;
-  gap: 16px; align-items: center; padding: 0 12px;
+  all: unset; box-sizing: border-box; width: 100%; min-height: 46px; padding: 0 14px; border-bottom: 1px solid var(--border); cursor: pointer;
+  display: grid; grid-template-columns: 18px minmax(170px, 1.2fr) minmax(200px, 2.2fr) 52px 110px 64px; grid-template-areas: "i w s n v d";
+  gap: 3px 14px; align-items: center;
 }
+.grow:last-child { border-bottom: 0; }
 .grow:hover { background: var(--hover); }
 .grow:focus-visible { box-shadow: inset 0 0 0 2px var(--text); }
 .grow.sel { background: var(--danger-soft); }
-.grow .gi { display: grid; place-items: center; color: var(--tf); }
-.grow .who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grow.on { background: var(--panel); box-shadow: inset 3px 0 0 var(--text); }
+.grow .gi { grid-area: i; display: grid; place-items: center; color: var(--tf); }
+.grow .who { grid-area: w; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .grow .who span { font-weight: 400; color: var(--muted); }
-.grow .sum { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.grow .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
-.grow .d { text-align: right; font-size: 13px; color: var(--muted); }
+.grow .sum { grid-area: s; font-size: 13.5px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grow .n { grid-area: n; justify-self: end; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.grow .v { grid-area: v; }
+.grow .d { grid-area: d; justify-self: end; font-size: 13px; color: var(--muted); }
 .grow .mark { font-size: 13px; }
+.rail .grow { grid-template-columns: 18px minmax(0, 1fr) auto; grid-template-areas: "i w n" ". v v" ". s s"; gap: 3px 10px; padding: 11px 14px; }
+.rail .grow .d { display: none; }
+
+/* Title and counts of the view, above the list and above the column alike. */
+.view-title { view-transition-name: view-title; display: flex; flex-direction: column; gap: 2px; }
+.view-title h1 { margin: 0; font: 700 22px/1.2 var(--head); letter-spacing: -0.015em; }
+.view-title .muted { font-size: 13px; }
 
 .selection-bar {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 15;
@@ -333,23 +342,7 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 .rail-head { display: flex; flex-direction: column; align-items: flex-start; padding: 14px 16px 16px; border-bottom: 1px solid var(--border); flex: none; }
 .rail-head .back { padding-left: 6px; margin-bottom: 14px; }
 .rail-head .back svg { width: 16px; height: 16px; }
-.rail-head h2 { margin: 0; font: 700 20px/1.2 var(--head); letter-spacing: -0.015em; }
-.rail-head .muted { margin-top: 4px; font-size: 13px; }
 .rail-list { flex: 1; overflow: auto; }
-.rail-item {
-  all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto;
-  gap: 3px 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer;
-}
-.rail-item:hover { background: var(--hover); }
-.rail-item:focus-visible { box-shadow: inset 0 0 0 2px var(--text); }
-.rail-item.on { background: var(--panel); box-shadow: inset 3px 0 0 var(--text); }
-.rail-item .gi { display: grid; place-items: center; color: var(--tf); }
-.rail-item .who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rail-item .who span { font-weight: 400; color: var(--muted); }
-.rail-item .n { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.rail-item .rv, .rail-item .sum { grid-column: 2 / -1; }
-.rail-item .rv .mark { font-size: 12.5px; }
-.rail-item .sum { font-size: 13px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .detail { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--panel); }
 
 /* ---------- reader ---------- */
@@ -422,13 +415,18 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 /* ---------- view transitions (see `animate` in mod.rs) ----------
    The group list is one surface that shrinks into the rail and grows back; the detail column and the
    reader slide in from the right and back out. Everything else cross-fades. */
-.groups, .rail { view-transition-name: groups; }
+.groups, .rail-list { view-transition-name: groups; view-transition-group: contain; }
+.grow { view-transition-group: contain; }
+.grow, .grow > span { view-transition-class: row; }
 .detail { view-transition-name: detail; }
 .reader { view-transition-name: reader; }
 ::view-transition-group(*) { animation-duration: 0.3s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.2s; }
 /* The list keeps its natural size while its box resizes, clipped, instead of being stretched. */
-::view-transition-group(groups) { overflow: hidden; border-radius: var(--r-lg); }
+::view-transition-group-children(groups), ::view-transition-group-children(*.row) { overflow: clip; }
+::view-transition-group(groups) { border-radius: var(--r-lg); }
+/* Rows and their parts move; their text keeps its size (clipped, never stretched) as boxes resize. */
+::view-transition-old(*.row), ::view-transition-new(*.row) { width: auto; height: auto; object-fit: none; object-position: left center; animation-duration: 0.18s; }
 ::view-transition-old(groups), ::view-transition-new(groups) { width: auto; height: auto; object-fit: none; object-position: left top; animation-duration: 0.18s; }
 @keyframes slide-in { from { transform: translateX(56px); opacity: 0; } }
 @keyframes slide-out { to { transform: translateX(56px); opacity: 0; } }

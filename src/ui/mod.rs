@@ -353,7 +353,11 @@ fn animate(change: impl FnOnce() + 'static) {
         } else {
             const before = shell.dataset.view;
             document.startViewTransition(() => new Promise(done => {
-                const finish = () => { watch.disconnect(); clearTimeout(late); done(); };
+                const finish = () => {
+                    watch.disconnect(); clearTimeout(late);
+                    document.querySelector(".rail .grow.on")?.scrollIntoView({ block: "nearest" }); // the open group in view
+                    done();
+                };
                 const watch = new MutationObserver(() => { if (shell.dataset.view !== before) finish(); });
                 watch.observe(shell, { attributes: true, attributeFilter: ["data-view"] });
                 const late = setTimeout(finish, 300); // nothing changed (same view): don't hang

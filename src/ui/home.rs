@@ -58,7 +58,6 @@ fn page_window(current: usize, pages: usize) -> std::ops::Range<usize> {
 #[component]
 pub fn Home() -> Element {
     let mut s = use_context::<State>();
-    let filter = s.filter.read().clone();
     let groups = s.visible_groups();
     let held = s.held.read().len();
     let emails: usize = groups.iter().map(|g| g.ids.len()).sum();
@@ -75,8 +74,7 @@ pub fn Home() -> Element {
     rsx! {
         div { class: "home",
             div { class: "home-head",
-                h1 { "{title(&filter)}" }
-                span { class: "muted", "{emails} emails in {groups.len()} groups" }
+                ViewTitle { groups: groups.len(), emails }
                 span { class: "spacer" }
                 select {
                     class: "btn",
@@ -170,17 +168,24 @@ fn GroupList(groups: Vec<Group>) -> Element {
     }
 }
 
+/// One row per group, the same in the paged list and the reading column (CSS lays it out on one
+/// line or stacked). Each part has its own view-transition name, so opening or closing a group
+/// moves every row and part from one layout to the other.
 #[component]
-fn GroupRow(group: Group, selecting: bool, selected: bool) -> Element {
+fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] selected: bool, #[props(default)] on: bool) -> Element {
     let mut s = use_context::<State>();
     let g = group.clone();
     let summary = group.summary.as_ref().map_or_else(|| format!("Latest: {}", group.subject), |x| x.summary.clone());
+    let vt = transition_name(&group.key);
     rsx! {
         button {
             class: "grow hue-{hue(&group.category)}",
             class: if selected { "sel" },
+            class: if on { "on" },
             role: "listitem",
+            "aria-current": if on { "true" },
             title: "{group.category}",
+            style: "view-transition-name: {vt}",
             onclick: move |_| {
                 if selecting {
                     let mut sel = s.selected_groups.write();
@@ -191,17 +196,35 @@ fn GroupRow(group: Group, selecting: bool, selected: bool) -> Element {
                     open_group(s, &g);
                 }
             },
-            span { class: "gi",
+            span { class: "gi", style: "view-transition-name: {vt}-i",
                 if selecting { {check(selected, false)} } else { {icon(&group.category)} }
             }
-            span { class: "who",
+            span { class: "who", style: "view-transition-name: {vt}-w",
                 "{group.org} "
                 span { "{group.topic}" }
             }
-            span { class: "sum", "{summary}" }
-            span { class: "n", "{group.ids.len()}" }
-            span { {verdict_mark(group.verdict())} }
+            span { class: "n", style: "view-transition-name: {vt}-n", "{group.ids.len()}" }
+            span { class: "v", style: "view-transition-name: {vt}-v", {verdict_mark(group.verdict())} }
+            span { class: "sum", style: "view-transition-name: {vt}-s", "{summary}" }
             span { class: "d", "{fmt_date(&group.last)}" }
+        }
+    }
+}
+
+/// A CSS-safe name unique to a group key (keys hold any characters).
+fn transition_name(key: &str) -> String {
+    let hash = key.bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ b as u64).wrapping_mul(0x100000001b3));
+    format!("g{hash:x}")
+}
+
+/// Title and counts of the current view: the same element above the list and above the column.
+#[component]
+fn ViewTitle(groups: usize, emails: usize) -> Element {
+    let s = use_context::<State>();
+    rsx! {
+        div { class: "view-title",
+            h1 { "{title(&s.filter.read())}" }
+            span { class: "muted", "{emails} emails · {groups} groups" }
         }
     }
 }
@@ -210,7 +233,6 @@ fn GroupRow(group: Group, selecting: bool, selected: bool) -> Element {
 #[component]
 pub fn GroupRail() -> Element {
     let s = use_context::<State>();
-    let filter = s.filter.read().clone();
     let groups = s.visible_groups();
     let open = s.group.read().clone();
     let emails: usize = groups.iter().map(|g| g.ids.len()).sum();
@@ -221,37 +243,13 @@ pub fn GroupRail() -> Element {
                     {icon("back")}
                     "All groups"
                 }
-                h2 { "{title(&filter)}" }
-                span { class: "muted", "{emails} emails · {groups.len()} groups" }
+                ViewTitle { groups: groups.len(), emails }
             }
-            div { class: "rail-list",
+            div { class: "rail-list", role: "list",
                 for g in groups {
-                    RailItem { key: "{g.key}", on: open.as_ref() == Some(&g.key), group: g }
+                    GroupRow { key: "{g.key}", on: open.as_ref() == Some(&g.key), group: g }
                 }
             }
-        }
-    }
-}
-
-#[component]
-fn RailItem(group: Group, on: bool) -> Element {
-    let s = use_context::<State>();
-    let g = group.clone();
-    let summary = group.summary.as_ref().map_or_else(|| format!("Latest: {}", group.subject), |x| x.summary.clone());
-    rsx! {
-        button {
-            class: "rail-item hue-{hue(&group.category)}",
-            class: if on { "on" },
-            "aria-current": if on { "true" },
-            onclick: move |_| open_group(s, &g),
-            span { class: "gi", {icon(&group.category)} }
-            span { class: "who",
-                "{group.org} "
-                span { "{group.topic}" }
-            }
-            span { class: "n", "{group.ids.len()}" }
-            span { class: "rv", {verdict_mark(group.verdict())} }
-            span { class: "sum", "{summary}" }
         }
     }
 }
@@ -311,6 +309,13 @@ fn Empty() -> Element {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn transition_names_are_css_safe_and_distinct() {
+        let (a, b) = (transition_name("Zalando|promo tion/€"), transition_name("Zalando|promotion"));
+        assert!(a.starts_with('g') && a.chars().all(|c| c.is_ascii_alphanumeric()));
+        assert_ne!(a, b);
+    }
 
     #[test]
     fn pages_round_up_and_never_zero() {
