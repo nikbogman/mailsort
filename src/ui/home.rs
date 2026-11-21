@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 
 use super::format::{check, fmt_date};
-use super::{Filter, Sort, State, ask_delete, open_group, show_held};
+use super::{Filter, Sort, State, ask_delete, close_group, open_group, show_held};
 use crate::classify::CATEGORIES;
 use crate::groups::{Group, Verdict};
 use crate::icons::icon;
@@ -216,9 +216,13 @@ pub fn GroupRail() -> Element {
     let emails: usize = groups.iter().map(|g| g.ids.len()).sum();
     rsx! {
         section { class: "rail", "aria-label": "Groups",
-            div { class: "rail-head",
+            header { class: "rail-head",
+                button { class: "btn small back", title: "Back to all groups (Esc)", onclick: move |_| close_group(s),
+                    {icon("back")}
+                    "All groups"
+                }
                 h2 { "{title(&filter)}" }
-                span { class: "muted", "{emails} emails, {groups.len()} groups" }
+                span { class: "muted", "{emails} emails · {groups.len()} groups" }
             }
             div { class: "rail-list",
                 for g in groups {

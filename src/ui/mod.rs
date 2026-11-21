@@ -295,33 +295,76 @@ fn show_held(mut s: State) {
     s.groups.write().extend(held);
 }
 
-fn show(mut s: State, filter: Filter) {
-    let trash = filter == Filter::Trash;
-    s.filter.set(filter);
-    s.group.set(None);
-    s.open.set(None);
-    s.selecting.set(false);
-    s.page.set(0);
-    s.clear_selection();
-    // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
-    let cached = if trash { s.trash_cache.peek().clone() } else { None };
-    s.loading.set(trash && cached.is_none());
-    s.emails.set(cached.unwrap_or_default());
-    spawn_forever(refresh(s, true));
+fn show(s: State, filter: Filter) {
+    animate(move || {
+        let mut s = s;
+        let trash = filter == Filter::Trash;
+        s.filter.set(filter);
+        s.group.set(None);
+        s.open.set(None);
+        s.selecting.set(false);
+        s.page.set(0);
+        s.clear_selection();
+        // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
+        let cached = if trash { s.trash_cache.peek().clone() } else { None };
+        s.loading.set(trash && cached.is_none());
+        s.emails.set(cached.unwrap_or_default());
+        spawn_forever(refresh(s, true));
+    });
 }
 
-fn open_group(mut s: State, g: &Group) {
-    s.group.set(Some(g.key.clone()));
-    s.open.set(None);
-    s.selected.write().clear();
-    s.emails.set(db::by_ids(&g.ids));
+fn open_group(s: State, g: &Group) {
+    let (key, ids) = (g.key.clone(), g.ids.clone());
+    animate(move || {
+        let mut s = s;
+        s.group.set(Some(key));
+        s.open.set(None);
+        s.selected.write().clear();
+        s.emails.set(db::by_ids(&ids));
+    });
 }
 
-fn close_group(mut s: State) {
-    s.group.set(None);
-    s.open.set(None);
-    s.selected.write().clear();
-    s.emails.write().clear();
+fn close_group(s: State) {
+    animate(move || {
+        let mut s = s;
+        s.group.set(None);
+        s.open.set(None);
+        s.selected.write().clear();
+        s.emails.write().clear();
+    });
+}
+
+/// Open an email (or close it with `None`).
+fn read_email(mut s: State, id: Option<String>) {
+    animate(move || s.open.set(id));
+}
+
+/// Runs a view change inside a View Transition: the browser snapshots the old layout, the change
+/// renders, then it morphs one into the other (the moving parts are named in style.css). Waits
+/// for `.shell[data-view]` to change before letting the new layout show. No API or reduced
+/// motion: the change just happens.
+fn animate(change: impl FnOnce() + 'static) {
+    const JS: &str = r#"
+        // The clicked button may be gone after the change: give focus back to the app so Esc still works.
+        setTimeout(() => { if (document.activeElement === document.body) document.querySelector(".app")?.focus({ preventScroll: true }); }, 350);
+        const shell = document.querySelector(".shell");
+        if (!document.startViewTransition || !shell || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            dioxus.send(true);
+        } else {
+            const before = shell.dataset.view;
+            document.startViewTransition(() => new Promise(done => {
+                const finish = () => { watch.disconnect(); clearTimeout(late); done(); };
+                const watch = new MutationObserver(() => { if (shell.dataset.view !== before) finish(); });
+                watch.observe(shell, { attributes: true, attributeFilter: ["data-view"] });
+                const late = setTimeout(finish, 300); // nothing changed (same view): don't hang
+                dioxus.send(true);
+            }));
+        }
+    "#;
+    spawn(async move {
+        let _ = document::eval(JS).recv::<bool>().await;
+        change();
+    });
 }
 
 /// How often a running sync may refresh the screen.
@@ -424,11 +467,13 @@ pub fn App() -> Element {
     }
 
     let open = s.open.read().clone();
+    // Changes whenever the layout does; `animate` waits for it.
+    let view = format!("{:?}|{:?}|{:?}", s.filter.read(), s.group.read(), open);
     rsx! {
         div { class: "app", tabindex: "0", autofocus: true, onkeydown: move |e| on_key(s, e),
             topbar::TopBar {}
             overlays::ErrorBanner {}
-            div { class: "shell",
+            div { class: "shell", "data-view": "{view}",
                 sidebar::Sidebar {}
                 if s.in_trash() {
                     // Trash: list and reader side by side.
@@ -478,7 +523,7 @@ fn on_key(mut s: State, e: Event<KeyboardData>) {
     }
     match e.key() {
         // Esc steps back one level: reader, selection, select mode, group, then back to all mail.
-        Key::Escape if s.open.peek().is_some() => s.open.set(None),
+        Key::Escape if s.open.peek().is_some() => read_email(s, None),
         Key::Escape if s.has_selection() => s.clear_selection(),
         Key::Escape if *s.selecting.peek() => s.selecting.set(false),
         Key::Escape if s.group.peek().is_some() => close_group(s),

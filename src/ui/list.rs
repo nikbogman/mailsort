@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 
 use super::format::{avatar, check, fmt_date, fmt_range, sender_name};
 use super::home::{hue, verdict_mark};
-use super::{State, ask_delete, close_group};
+use super::{State, ask_delete, read_email};
 use crate::db::Email;
 use crate::groups::Verdict;
 use crate::icons::icon;
@@ -47,9 +47,6 @@ pub fn EmailToolbar() -> Element {
     rsx! {
         header { class: "toolbar",
             div { class: "toolbar-main",
-                if !trash {
-                    button { class: "icon", title: "Back to overview (Esc)", onclick: move |_| close_group(s), {icon("back")} }
-                }
                 // Anything selected: clears. Nothing selected: selects all.
                 span {
                     class: "check-hit",
@@ -197,7 +194,7 @@ fn Row(email: Email, selected: bool, open: bool, trash: bool) -> Element {
             class: "row",
             class: if selected { "selected" },
             class: if open { "open" },
-            onclick: move |_| s.open.set(Some(id_open.clone())),
+            onclick: move |_| read_email(s, Some(id_open.clone())),
             span {
                 class: "check-hit",
                 onclick: move |e| {

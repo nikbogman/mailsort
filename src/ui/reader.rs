@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 
 use super::format::{avatar, email_document, has_remote_images, sender_address, sender_name};
-use super::{State, ask_delete};
+use super::{State, ask_delete, read_email};
 use crate::google;
 use crate::icons::icon;
 use crate::queue::{self, Kind};
@@ -11,7 +11,7 @@ use crate::queue::{self, Kind};
 /// Keyed by email id in the parent, so per-email state (shown images) resets on each email.
 #[component]
 pub fn Reader() -> Element {
-    let mut s = use_context::<State>();
+    let s = use_context::<State>();
     let mut show_images = use_signal(|| false);
     let body = use_resource(move || async move {
         let id = s.open.read().clone()?;
@@ -48,7 +48,7 @@ pub fn Reader() -> Element {
     rsx! {
         section { class: "reader",
             div { class: "reader-bar",
-                button { class: "icon", title: "Close (Esc)", onclick: move |_| s.open.set(None), {icon("back")} }
+                button { class: "icon", title: "Close (Esc)", onclick: move |_| read_email(s, None), {icon("back")} }
                 span { class: "actions",
                     button { class: "btn danger-ghost", onclick: move |_| ask_delete(s, vec![id_delete.clone()]),
                         {icon("deleteForever")}
