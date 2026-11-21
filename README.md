@@ -38,7 +38,7 @@ It uses a **local model, Qwen 2.5 3B through Ollama**, because I don't want a cl
 ```mermaid
 flowchart LR
     subgraph app["mailsort.exe"]
-        UI["UI<br/>spectrum, lists, reader"]
+        UI["UI<br/>sidebar, group pages, reader"]
         Queue["queue<br/>trash, delete, undo"]
         Sync["sync<br/>fetch, analyze, summarize"]
         Classify["classify<br/>rules + model prompts"]

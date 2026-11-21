@@ -1,7 +1,8 @@
 //! App state, data loading, and the root component.
 //!
-//! Home is the spectrum: one bar of the inbox by category, then the list of groups (organization, topic), each
-//! with a summary and verdict. Opening a group (or Trash) shows its emails with the reader.
+//! A sidebar lists every view (all mail, verdicts, categories, Trash). Home is the view's groups (organization,
+//! topic), each with a summary and verdict, a page at a time. Opening a group keeps the groups in a column beside
+//! its emails and the reader.
 //!
 //! Updates while you look at the screen: rows keep their place (`order`); new groups found by a
 //! running sync wait in `held` behind a "Show N new groups" button instead of pushing rows around.
@@ -12,6 +13,7 @@ mod home;
 mod overlays;
 mod reader;
 mod setup;
+mod sidebar;
 mod topbar;
 
 use std::collections::{HashMap, HashSet};
@@ -30,6 +32,14 @@ use crate::groups::{self, Group, Verdict};
 use crate::icons;
 use crate::queue::{self, Job, Kind};
 use crate::sync::{self, Stage};
+
+/// Order of the group list.
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum Sort {
+    /// Most emails first; keeps its place while a sync adds mail.
+    Size,
+    Newest,
+}
 
 /// What the overview shows (or Trash, which is a plain email list from Gmail).
 #[derive(Clone, PartialEq, Debug)]
@@ -74,6 +84,9 @@ pub struct State {
     pub selected_groups: Signal<HashSet<String>>,
     /// Select mode: clicking a group row selects it instead of opening it.
     pub selecting: Signal<bool>,
+    /// Page of the group list (0-based) and its sort.
+    pub page: Signal<usize>,
+    pub sort: Signal<Sort>,
     /// Email open in the reader.
     pub open: Signal<Option<String>>,
     pub query: Signal<String>,
@@ -92,11 +105,6 @@ impl State {
 
     pub fn in_trash_peek(&self) -> bool {
         *self.filter.peek() == Filter::Trash
-    }
-
-    /// Showing a list of emails (a group or Trash) rather than the overview.
-    fn showing_emails(&self) -> bool {
-        self.in_trash() || self.group.read().is_some()
     }
 
     fn open_group(&self) -> Option<Group> {
@@ -129,6 +137,9 @@ impl State {
             .cloned()
             .collect();
         groups.sort_by_key(|g| position.get(&g.key).copied().unwrap_or(usize::MAX));
+        if *self.sort.read() == Sort::Newest {
+            groups.sort_by(|a, b| b.last.cmp(&a.last));
+        }
         groups
     }
 
@@ -290,6 +301,7 @@ fn show(mut s: State, filter: Filter) {
     s.group.set(None);
     s.open.set(None);
     s.selecting.set(false);
+    s.page.set(0);
     s.clear_selection();
     // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
     let cached = if trash { s.trash_cache.peek().clone() } else { None };
@@ -388,6 +400,8 @@ pub fn App() -> Element {
         sync: use_signal(SyncState::default),
         error: use_signal(|| None),
         search: use_signal(|| None),
+        page: use_signal(|| 0),
+        sort: use_signal(|| Sort::Size),
     };
     use_context_provider(|| s);
     let mut ready = use_signal(google::has_credentials);
@@ -414,24 +428,40 @@ pub fn App() -> Element {
         div { class: "app", tabindex: "0", autofocus: true, onkeydown: move |e| on_key(s, e),
             topbar::TopBar {}
             overlays::ErrorBanner {}
-            if s.showing_emails() {
-                // Always two panes, so opening an email doesn't reflow the list.
-                main { class: "content",
-                    section { class: "list-pane",
-                        list::EmailToolbar {}
-                        list::EmailList {}
-                    }
-                    if let Some(id) = open {
-                        reader::Reader { key: "{id}" }
-                    } else {
-                        div { class: "reader-empty",
-                            span { class: "empty-icon", {icons::icon("mail")} }
-                            "Select an email to read it"
+            div { class: "shell",
+                sidebar::Sidebar {}
+                if s.in_trash() {
+                    // Trash: list and reader side by side.
+                    main { class: "content",
+                        section { class: "list-pane",
+                            list::EmailToolbar {}
+                            list::EmailList {}
+                        }
+                        if let Some(id) = open {
+                            reader::Reader { key: "{id}" }
+                        } else {
+                            div { class: "reader-empty",
+                                span { class: "empty-icon", {icons::icon("mail")} }
+                                "Select an email to read it"
+                            }
                         }
                     }
+                } else if s.group.read().is_some() {
+                    // Reading: the groups stay in a column; the open group's emails (or one email) fill the rest.
+                    main { class: "columns",
+                        home::GroupRail {}
+                        section { class: "detail",
+                            if let Some(id) = open {
+                                reader::Reader { key: "{id}" }
+                            } else {
+                                list::EmailToolbar {}
+                                list::EmailList {}
+                            }
+                        }
+                    }
+                } else {
+                    main { class: "home-scroll", home::Home {} }
                 }
-            } else {
-                main { class: "home-scroll", home::Home {} }
             }
         }
         overlays::Queue {}
