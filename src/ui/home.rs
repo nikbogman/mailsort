@@ -169,8 +169,8 @@ fn GroupList(groups: Vec<Group>) -> Element {
 }
 
 /// One row per group, the same in the paged list and the reading column (CSS lays it out on one
-/// line or stacked). Each part has its own view-transition name, so opening or closing a group
-/// moves every row and part from one layout to the other.
+/// line or stacked). `data-vt` lets `animate` move the rows on screen, and their parts, from one
+/// layout to the other.
 #[component]
 fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] selected: bool, #[props(default)] on: bool) -> Element {
     let mut s = use_context::<State>();
@@ -185,7 +185,7 @@ fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] s
             role: "listitem",
             "aria-current": if on { "true" },
             title: "{group.category}",
-            style: "view-transition-name: {vt}",
+            "data-vt": "{vt}",
             onclick: move |_| {
                 if selecting {
                     let mut sel = s.selected_groups.write();
@@ -196,16 +196,16 @@ fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] s
                     open_group(s, &g);
                 }
             },
-            span { class: "gi", style: "view-transition-name: {vt}-i",
+            span { class: "gi",
                 if selecting { {check(selected, false)} } else { {icon(&group.category)} }
             }
-            span { class: "who", style: "view-transition-name: {vt}-w",
+            span { class: "who",
                 "{group.org} "
                 span { "{group.topic}" }
             }
-            span { class: "n", style: "view-transition-name: {vt}-n", "{group.ids.len()}" }
-            span { class: "v", style: "view-transition-name: {vt}-v", {verdict_mark(group.verdict())} }
-            span { class: "sum", style: "view-transition-name: {vt}-s", "{summary}" }
+            span { class: "n", "{group.ids.len()}" }
+            span { class: "v", {verdict_mark(group.verdict())} }
+            span { class: "sum", "{summary}" }
             span { class: "d", "{fmt_date(&group.last)}" }
         }
     }

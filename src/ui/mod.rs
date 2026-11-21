@@ -296,7 +296,9 @@ fn show_held(mut s: State) {
 }
 
 fn show(s: State, filter: Filter) {
-    animate(move || {
+    // From a group's column back to a full list: the rows change layout.
+    let rows = s.group.peek().is_some();
+    animate(rows, move || {
         let mut s = s;
         let trash = filter == Filter::Trash;
         s.filter.set(filter);
@@ -315,7 +317,9 @@ fn show(s: State, filter: Filter) {
 
 fn open_group(s: State, g: &Group) {
     let (key, ids) = (g.key.clone(), g.ids.clone());
-    animate(move || {
+    // From the full list the rows shrink into the column; within the column they stay put.
+    let rows = s.group.peek().is_none();
+    animate(rows, move || {
         let mut s = s;
         s.group.set(Some(key));
         s.open.set(None);
@@ -325,7 +329,7 @@ fn open_group(s: State, g: &Group) {
 }
 
 fn close_group(s: State) {
-    animate(move || {
+    animate(true, move || {
         let mut s = s;
         s.group.set(None);
         s.open.set(None);
@@ -336,26 +340,46 @@ fn close_group(s: State) {
 
 /// Open an email (or close it with `None`).
 fn read_email(mut s: State, id: Option<String>) {
-    animate(move || s.open.set(id));
+    animate(false, move || s.open.set(id));
 }
 
 /// Runs a view change inside a View Transition: the browser snapshots the old layout, the change
 /// renders, then it morphs one into the other (the moving parts are named in style.css). Waits
 /// for `.shell[data-view]` to change before letting the new layout show. No API or reduced
 /// motion: the change just happens.
-fn animate(change: impl FnOnce() + 'static) {
+///
+/// `rows`: the group list changes layout, so its rows on screen (and their parts) get names for
+/// this one transition and move individually. Only those on screen: every name is a layer to
+/// animate, and naming all rows made it stutter.
+fn animate(rows: bool, change: impl FnOnce() + 'static) {
     const JS: &str = r#"
+        const rows = await dioxus.recv();
         // The clicked button may be gone after the change: give focus back to the app so Esc still works.
         setTimeout(() => { if (document.activeElement === document.body) document.querySelector(".app")?.focus({ preventScroll: true }); }, 350);
         const shell = document.querySelector(".shell");
+        // Name the group rows on screen (from `keep`, if given) and their parts; returns their keys.
+        const named = [];
+        const name = (keep) => {
+            const keys = new Set();
+            for (const row of document.querySelectorAll(".grow[data-vt]")) {
+                const r = row.getBoundingClientRect();
+                const k = row.dataset.vt;
+                if (r.bottom < 0 || r.top > innerHeight || (keep && !keep.has(k))) continue;
+                keys.add(k);
+                [row, ...row.children].forEach((el, i) => { el.style.viewTransitionName = i ? `${k}-${i}` : k; named.push(el); });
+            }
+            return keys;
+        };
         if (!document.startViewTransition || !shell || matchMedia("(prefers-reduced-motion: reduce)").matches) {
             dioxus.send(true);
         } else {
             const before = shell.dataset.view;
-            document.startViewTransition(() => new Promise(done => {
+            const shown = rows ? name() : null;
+            const vt = document.startViewTransition(() => new Promise(done => {
                 const finish = () => {
                     watch.disconnect(); clearTimeout(late);
                     document.querySelector(".rail .grow.on")?.scrollIntoView({ block: "nearest" }); // the open group in view
+                    if (shown) name(shown);
                     done();
                 };
                 const watch = new MutationObserver(() => { if (shell.dataset.view !== before) finish(); });
@@ -363,10 +387,13 @@ fn animate(change: impl FnOnce() + 'static) {
                 const late = setTimeout(finish, 300); // nothing changed (same view): don't hang
                 dioxus.send(true);
             }));
+            vt.finished.finally(() => named.forEach(el => el.style.viewTransitionName = ""));
         }
     "#;
     spawn(async move {
-        let _ = document::eval(JS).recv::<bool>().await;
+        let mut js = document::eval(JS);
+        let _ = js.send(rows);
+        let _ = js.recv::<bool>().await;
         change();
     });
 }
