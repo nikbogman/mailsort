@@ -31,34 +31,11 @@ pub async fn sleep(d: std::time::Duration) {
     gloo_timers::future::sleep(d).await;
 }
 
-/// Window and taskbar icon: a tiny inbox map (same drawing as `topbar::logo`), drawn here so no
-/// image file or decoder is needed.
+/// Window and taskbar icon: the dark logo as raw 64x64 RGBA, so no image decoder is needed.
+/// `assets/icon-64.rgba` is rendered from `assets/logo-dark.svg` (same as `icon.ico`).
 #[cfg(not(target_arch = "wasm32"))]
 fn app_icon() -> Option<Icon> {
-    const N: u32 = 64;
-    const R: u32 = 12; // corner radius
-    // (x0, y0, x1, y1, colour); later blocks paint over earlier ones.
-    let blocks: [(u32, u32, u32, u32, [u8; 3]); 5] = [
-        (6, 6, 36, 58, [0xc9, 0xb4, 0x8c]),
-        (6, 40, 36, 58, [0xd9, 0x36, 0x36]),
-        (38, 6, 58, 32, [0x2f, 0xb3, 0xa3]),
-        (38, 34, 47, 58, [0x5b, 0x8d, 0xef]),
-        (49, 34, 58, 58, [0x9b, 0x7b, 0xea]),
-    ];
-    let mut rgba = Vec::with_capacity((N * N * 4) as usize);
-    for y in 0..N {
-        for x in 0..N {
-            let dx = if x < R { R - x } else if x >= N - R { x + R + 1 - N } else { 0 };
-            let dy = if y < R { R - y } else if y >= N - R { y + R + 1 - N } else { 0 };
-            if dx * dx + dy * dy > R * R {
-                rgba.extend_from_slice(&[0, 0, 0, 0]);
-                continue;
-            }
-            let c = blocks.iter().rev().find(|b| x >= b.0 && x < b.2 && y >= b.1 && y < b.3).map_or([0x1b, 0x1d, 0x22], |b| b.4);
-            rgba.extend_from_slice(&[c[0], c[1], c[2], 255]);
-        }
-    }
-    Icon::from_rgba(rgba, N, N).ok()
+    Icon::from_rgba(include_bytes!("../assets/icon-64.rgba").to_vec(), 64, 64).ok()
 }
 
 #[cfg(target_arch = "wasm32")]

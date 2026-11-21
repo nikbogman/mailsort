@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="assets/logo.svg" width="96" height="96" alt="mailsort icon">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+  <img src="assets/logo-light.svg" width="96" height="96" alt="mailsort logo">
+</picture>
 
 # mailsort
 

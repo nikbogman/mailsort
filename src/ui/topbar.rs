@@ -8,18 +8,14 @@ use super::{Filter, State, SyncState, close_group, show, start_sync};
 use crate::icons::icon;
 use crate::sync::{self, Stage};
 
-/// The app icon at small size: a tiny inbox map (same drawing as the window icon in main.rs).
-/// Large renders (assets/logo.svg) hatch the red part instead, as in the design.
+/// The logo: a sheet of stamps, the red-crossed one peeling off. Both versions are inlined;
+/// the stylesheet shows the one that matches the theme.
 pub fn logo() -> Element {
+    const DARK: &str = include_str!("../../assets/logo-dark.svg");
+    const LIGHT: &str = include_str!("../../assets/logo-light.svg");
     rsx! {
-        svg { class: "logo", width: "22", height: "22", view_box: "0 0 64 64", "aria-hidden": "true",
-            rect { width: "64", height: "64", rx: "12", fill: "#1b1d22" }
-            rect { x: "6", y: "6", width: "30", height: "52", rx: "2", fill: "#c9b48c" }
-            rect { x: "6", y: "40", width: "30", height: "18", rx: "2", fill: "#d93636" }
-            rect { x: "38", y: "6", width: "20", height: "26", rx: "2", fill: "#2fb3a3" }
-            rect { x: "38", y: "34", width: "9", height: "24", rx: "2", fill: "#5b8def" }
-            rect { x: "49", y: "34", width: "9", height: "24", rx: "2", fill: "#9b7bea" }
-        }
+        span { class: "logo logo-dark", "aria-hidden": "true", dangerous_inner_html: DARK }
+        span { class: "logo logo-light", "aria-hidden": "true", dangerous_inner_html: LIGHT }
     }
 }
 
