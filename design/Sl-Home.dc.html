@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spectrum, white</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600;700&amp;display=swap"><style>
+body{margin:0}
+.sl{--font:"Figtree",ui-sans-serif,system-ui,sans-serif;--head:"Bricolage Grotesque",var(--font);
+--bg:#f7f7f5;--panel:#fff;--text:#1b1d22;--text-2:#3d414b;--muted:#5d6270;--border:#e3e3de;--border-strong:#c9c9c3;--hover:#efefeb;
+--danger:#d93636;--danger-text:#b42323;
+font-family:var(--font);font-size:14px;line-height:1.45;color:var(--text);background:var(--bg);min-height:900px}
+.sl a{color:inherit;text-decoration:none}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;gap:10px;min-height:60px;padding:0 24px}
+.brand{display:inline-flex;align-items:center;gap:8px;font:700 17px var(--head)}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.crumbs .here{color:var(--text);font-weight:500}
+.ib{width:34px;height:34px;display:grid;place-items:center;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);cursor:pointer}
+.ib:hover{border-color:var(--border);background:var(--panel);color:var(--text)}
+.srch{display:flex;align-items:center;gap:8px;height:34px;width:240px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--muted);box-sizing:border-box}
+.srch input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;color:var(--text)}
+.kbd{font-size:11px;border:1px solid var(--border-strong);border-radius:4px;padding:0 5px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.total{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-top:24px}
+.total h1{margin:0;font:700 44px/1 var(--head);letter-spacing:-0.03em}
+.total span{color:var(--muted)}
+.bar{display:flex;gap:4px;height:44px;margin-top:20px}
+.grp{display:flex;gap:2px;min-width:0;border-radius:6px;overflow:hidden}
+.seg{display:block;min-width:10px;height:100%;background:var(--c)}
+.seg:hover{filter:brightness(1.08) saturate(1.1)}
+.seg.dim{opacity:.16 !important}
+.seg.on{box-shadow:inset 0 0 0 2px var(--text)}
+.glabels{display:flex;gap:4px;margin-top:10px}
+.glabels a{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;overflow:hidden}
+.glabels b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glabels em{font-style:normal;color:var(--muted)}
+.fbar{display:flex;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+.legend{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+.lg{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:1px solid transparent;border-radius:6px;background:none;font:inherit;font-size:13px;color:var(--text-2);cursor:pointer}
+.lg.on{background:var(--hover);border-color:var(--border-strong);color:var(--text)}
+.vs{width:10px;height:10px;box-sizing:border-box;display:inline-block;border-radius:2px;flex:none}
+.vs.go{background:var(--danger)}
+.vs.rv{border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.vs.kp{border:1.5px solid currentColor}
+.lg .go{color:var(--danger-text);font-weight:600}
+.acts{display:flex;gap:8px;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:1px solid var(--border-strong);border-radius:6px;background:var(--panel);color:var(--text);font:inherit;font-weight:500;cursor:pointer;white-space:nowrap;box-sizing:border-box}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.list{padding-top:18px;padding-bottom:48px}
+.lhead,.row{display:grid;grid-template-columns:16px minmax(170px,1.2fr) minmax(200px,2.2fr) 48px 92px 60px;gap:16px;align-items:center;padding-right:12px}
+.lhead{height:32px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border-strong)}
+.lhead .r{text-align:right}
+.row{min-height:48px;border-bottom:1px solid var(--border)}
+.row:hover{background:var(--panel)}
+.edge{align-self:stretch;border-radius:2px;background:var(--c)}
+.who{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{font-weight:400;color:var(--muted)}
+.sum{color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.d{text-align:right;color:var(--muted);font-size:13px}
+.vl{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.vl.go{color:var(--danger-text)}
+</style></helmet>
+<div class="sl">
+<header class="top">
+<a class="brand" href="Sl-Home.dc.html"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#1b1d22"/><rect x="6" y="6" width="30" height="52" rx="2" fill="#c9b48c"/><rect x="6" y="40" width="30" height="18" rx="2" fill="#d93636"/><rect x="38" y="6" width="20" height="26" rx="2" fill="#2fb3a3"/><rect x="38" y="34" width="9" height="24" rx="2" fill="#5b8def"/><rect x="49" y="34" width="9" height="24" rx="2" fill="#9b7bea"/></svg>mailsort</a>
+<nav class="crumbs" aria-label="Breadcrumb"><span>/</span><span class="here">All mail</span></nav>
+<span style="flex: 1"></span>
+<span style="font-size: 13px; color: var(--muted)">Up to date</span>
+<button class="ib" type="button" aria-label="Sync now"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M3 21v-5h5"/></svg></button>
+<label class="srch"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14M21 21l-4.3-4.3"/></svg><input type="search" placeholder="Search senders and topics" aria-label="Search senders and topics"><span class="kbd">/</span></label>
+<button class="ib" type="button" aria-label="Switch theme"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+<a class="ib" href="Mp-Trash.dc.html" aria-label="Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></a>
+</header>
+
+<section class="wrap" aria-label="Inbox by category">
+<div class="total"><h1>852</h1><span>emails in your inbox, sorted into 14 categories</span></div>
+<div class="bar" role="group" aria-label="Categories by size">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+<div class="grp" style="flex: {{g.n}}">
+<sc-for list="{{g.segs}}" as="s" hint-placeholder-count="4"><a class="{{s.cls}}" href="Sl-Category.dc.html" title="{{s.tip}}" aria-label="{{s.tip}}" style="flex: {{s.n}}; --c: {{s.c}}; opacity: {{s.o}}"></a></sc-for>
+</div>
+</sc-for>
+</div>
+<div class="glabels">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+<a href="Sl-Category.dc.html" style="flex: {{g.n}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{g.c}}"><path d="{{g.icon}}"/></svg><b>{{g.name}}</b><em>{{g.n}}</em></a>
+</sc-for>
+</div>
+
+<div class="fbar">
+<div class="legend" role="group" aria-label="Show by verdict">
+<button class="lg on" type="button">All</button>
+<button class="lg" type="button"><span class="vs go"></span><span class="go">645 can go</span></button>
+<button class="lg" type="button"><span class="vs rv"></span>70 to review</button>
+<button class="lg" type="button"><span class="vs kp"></span>137 keep</button>
+</div>
+<div class="acts">
+<a class="btn danger" href="Hs-Select.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Select 645 that can go</a>
+<a class="btn" href="Hs-Select.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Select</a>
+</div>
+</div>
+</section>
+
+<section class="wrap list" aria-label="Groups">
+<div class="lhead"><span></span><span>From</span><span>Summary</span><span class="r">Emails</span><span>Verdict</span><span class="r">Latest</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<a class="row" href="Mp-Group.dc.html" style="--c: {{r.c}}">
+<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.c}}"><path d="{{r.icon}}"/></svg>
+<span class="who">{{r.org}} <span>{{r.topic}}</span></span>
+<span class="sum">{{r.sum}}</span>
+<span class="n">{{r.n}}</span>
+<span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span>
+<span class="d">{{r.d}}</span>
+</a>
+</sc-for>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {"groups": [{"name": "Important", "n": 148, "segs": [{"n": 48, "o": 1, "c": "#5b8def", "cls": "seg", "tip": "Receipts: 48 emails, 0 can go"}, {"n": 35, "o": 0.78, "c": "#5b8def", "cls": "seg", "tip": "Work: 35 emails, 0 can go"}, {"n": 31, "o": 0.6, "c": "#5b8def", "cls": "seg", "tip": "Security: 31 emails, 31 can go"}, {"n": 18, "o": 0.47, "c": "#5b8def", "cls": "seg", "tip": "Admin: 18 emails, 0 can go"}, {"n": 16, "o": 0.37, "c": "#5b8def", "cls": "seg", "tip": "Personal: 16 emails, 0 can go"}], "c": "#5b8def", "icon": "M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"}, {"name": "Dev & services", "n": 192, "segs": [{"n": 131, "o": 1, "c": "#2fb3a3", "cls": "seg", "tip": "Dev Tools: 131 emails, 90 can go"}, {"n": 39, "o": 0.78, "c": "#2fb3a3", "cls": "seg", "tip": "Services: 39 emails, 21 can go"}, {"n": 22, "o": 0.6, "c": "#2fb3a3", "cls": "seg", "tip": "Alerts: 22 emails, 22 can go"}], "c": "#2fb3a3", "icon": "M16 18l6-6-6-6M8 6l-6 6 6 6"}, {"name": "Updates", "n": 146, "segs": [{"n": 80, "o": 1, "c": "#9b7bea", "cls": "seg", "tip": "Social: 80 emails, 80 can go"}, {"n": 52, "o": 0.78, "c": "#9b7bea", "cls": "seg", "tip": "Notifications: 52 emails, 52 can go"}, {"n": 14, "o": 0.6, "c": "#9b7bea", "cls": "seg", "tip": "Events: 14 emails, 14 can go"}], "c": "#9b7bea", "icon": "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8a4 4 0 1 0 0-8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"}, {"name": "Low priority", "n": 366, "segs": [{"n": 172, "o": 1, "c": "#c9b48c", "cls": "seg", "tip": "Newsletters: 172 emails, 141 can go"}, {"n": 156, "o": 0.78, "c": "#c9b48c", "cls": "seg", "tip": "Promotions: 156 emails, 156 can go"}, {"n": 38, "o": 0.6, "c": "#c9b48c", "cls": "seg", "tip": "Spam: 38 emails, 38 can go"}], "c": "#c9b48c", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8"}], "rows": [{"org": "Medium", "topic": "daily digest", "sum": "Daily picks of stories based on what you read.", "n": 88, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8", "c": "#c9b48c"}, {"org": "GitHub", "topic": "ci failure", "sum": "Failed workflow runs on your repositories.", "n": 72, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M16 18l6-6-6-6M8 6l-6 6 6 6", "c": "#2fb3a3"}, {"org": "Zalando", "topic": "promotion", "sum": "Sales and new arrivals.", "n": 64, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01", "c": "#c9b48c"}, {"org": "LinkedIn", "topic": "notification", "sum": "Profile views, likes and suggested connections.", "n": 54, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8a4 4 0 1 0 0-8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75", "c": "#9b7bea"}, {"org": "Substack", "topic": "newsletter", "sum": "Weekly posts from writers you follow.", "n": 53, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8", "c": "#c9b48c"}, {"org": "Bol", "topic": "promotion", "sum": "Deals and product picks.", "n": 52, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01", "c": "#c9b48c"}, {"org": "GitHub", "topic": "pull request", "sum": "Reviews and comments on your pull requests.", "n": 41, "v": "kp", "vl": "Keep", "d": "19 Nov", "icon": "M16 18l6-6-6-6M8 6l-6 6 6 6", "c": "#2fb3a3"}, {"org": "Steam", "topic": "wishlist sale", "sum": "Games on your wishlist went on sale.", "n": 40, "v": "go", "vl": "Can go", "d": "18 Nov", "icon": "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01", "c": "#c9b48c"}, {"org": "Prize Desk", "topic": "prize claim", "sum": "Messages claiming you won something.", "n": 38, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M4.93 4.93l14.14 14.14", "c": "#c9b48c"}, {"org": "The Verge", "topic": "newsletter", "sum": "Tech news in your inbox each morning.", "n": 31, "v": "rv", "vl": "Review", "d": "18 Nov", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8", "c": "#c9b48c"}, {"org": "PostNL", "topic": "delivery update", "sum": "Tracking updates for parcels.", "n": 30, "v": "go", "vl": "Can go", "d": "18 Nov", "icon": "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0", "c": "#9b7bea"}, {"org": "Discord", "topic": "mentions", "sum": "Mentions and messages you missed.", "n": 26, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8a4 4 0 1 0 0-8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75", "c": "#9b7bea"}, {"org": "Vestide", "topic": "rent invoice", "sum": "Monthly rent invoices and payment confirmations.", "n": 24, "v": "kp", "vl": "Keep", "d": "21 Oct", "icon": "M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4", "c": "#5b8def"}, {"org": "Amazon", "topic": "order confirmation", "sum": "Order confirmations and invoices.", "n": 24, "v": "kp", "vl": "Keep", "d": "12 Nov", "icon": "M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4", "c": "#5b8def"}, {"org": "Google Calendar", "topic": "reminder", "sum": "Reminders for past events.", "n": 22, "v": "go", "vl": "Can go", "d": "18 Nov", "icon": "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0", "c": "#9b7bea"}, {"org": "Grafana", "topic": "alert", "sum": "Firing and resolved alerts from the home server.", "n": 22, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M22 12h-4l-3 9L9 3l-3 9H2", "c": "#2fb3a3"}, {"org": "Studio Noord", "topic": "project", "sum": "Sara on the website project: drafts and feedback.", "n": 21, "v": "rv", "vl": "Review", "d": "17 Nov", "icon": "M4 7h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", "c": "#5b8def"}, {"org": "Vercel", "topic": "usage update", "sum": "Usage reports and plan notices.", "n": 21, "v": "go", "vl": "Can go", "d": "16 Nov", "icon": "M4 3h16v6H4zM4 15h16v6H4zM8 6h.01M8 18h.01", "c": "#2fb3a3"}]};
+  }
+}
+</script>
+</body>
+</html>

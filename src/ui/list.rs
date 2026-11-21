@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 
 use super::format::{avatar, check, fmt_date, fmt_range, sender_name};
-use super::map::{hue, verdict_mark};
+use super::home::{hue, verdict_mark};
 use super::{State, ask_delete, close_group};
 use crate::db::Email;
 use crate::groups::Verdict;

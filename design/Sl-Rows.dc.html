@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Row marker options</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600;700&amp;display=swap"><style>
+body{margin:0}
+.sl{--font:"Figtree",ui-sans-serif,system-ui,sans-serif;--head:"Bricolage Grotesque",var(--font);
+--bg:#f7f7f5;--panel:#fff;--text:#1b1d22;--text-2:#3d414b;--muted:#5d6270;--border:#e3e3de;--border-strong:#c9c9c3;--hover:#efefeb;
+--danger:#d93636;--danger-text:#b42323;
+font-family:var(--font);font-size:14px;line-height:1.45;color:var(--text);background:var(--bg);min-height:900px}
+.sl a{color:inherit;text-decoration:none}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;gap:10px;min-height:60px;padding:0 24px}
+.brand{display:inline-flex;align-items:center;gap:8px;font:700 17px var(--head)}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.crumbs .here{color:var(--text);font-weight:500}
+.ib{width:34px;height:34px;display:grid;place-items:center;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);cursor:pointer}
+.ib:hover{border-color:var(--border);background:var(--panel);color:var(--text)}
+.srch{display:flex;align-items:center;gap:8px;height:34px;width:240px;padding:0 10px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--muted);box-sizing:border-box}
+.srch input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;color:var(--text)}
+.kbd{font-size:11px;border:1px solid var(--border-strong);border-radius:4px;padding:0 5px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.total{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-top:24px}
+.total h1{margin:0;font:700 44px/1 var(--head);letter-spacing:-0.03em}
+.total span{color:var(--muted)}
+.bar{display:flex;gap:4px;height:44px;margin-top:20px}
+.grp{display:flex;gap:2px;min-width:0;border-radius:6px;overflow:hidden}
+.seg{display:block;min-width:10px;height:100%;background:var(--c)}
+.seg:hover{filter:brightness(1.08) saturate(1.1)}
+.seg.dim{opacity:.16 !important}
+.seg.on{box-shadow:inset 0 0 0 2px var(--text)}
+.glabels{display:flex;gap:4px;margin-top:10px}
+.glabels a{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;overflow:hidden}
+.glabels b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glabels em{font-style:normal;color:var(--muted)}
+.fbar{display:flex;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+.legend{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+.lg{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:1px solid transparent;border-radius:6px;background:none;font:inherit;font-size:13px;color:var(--text-2);cursor:pointer}
+.lg.on{background:var(--hover);border-color:var(--border-strong);color:var(--text)}
+.vs{width:10px;height:10px;box-sizing:border-box;display:inline-block;border-radius:2px;flex:none}
+.vs.go{background:var(--danger)}
+.vs.rv{border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.vs.kp{border:1.5px solid currentColor}
+.lg .go{color:var(--danger-text);font-weight:600}
+.acts{display:flex;gap:8px;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:1px solid var(--border-strong);border-radius:6px;background:var(--panel);color:var(--text);font:inherit;font-weight:500;cursor:pointer;white-space:nowrap;box-sizing:border-box}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.list{padding-top:18px;padding-bottom:48px}
+.lhead,.row{display:grid;grid-template-columns:4px 16px minmax(170px,1.2fr) minmax(200px,2.2fr) 48px 92px 60px;gap:16px;align-items:center;padding-right:12px}
+.lhead{height:32px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border-strong)}
+.lhead .r{text-align:right}
+.row{min-height:48px;border-bottom:1px solid var(--border)}
+.row:hover{background:var(--panel)}
+.edge{align-self:stretch;border-radius:2px;background:var(--c)}
+.who{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{font-weight:400;color:var(--muted)}
+.sum{color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.d{text-align:right;color:var(--muted);font-size:13px}
+.vl{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.vl.go{color:var(--danger-text)}
+
+.opt{margin-top:36px}
+.opt h2{margin:0;font:700 20px var(--head);letter-spacing:-0.01em}
+.opt p{margin:4px 0 10px;color:var(--muted)}
+.r{display:grid;gap:16px;align-items:center;min-height:48px;padding:0 12px 0 4px;border-bottom:1px solid var(--border)}
+.r:hover{background:var(--panel)}
+.ra{grid-template-columns:32px minmax(170px,1.2fr) minmax(200px,2.2fr) 48px 92px 60px}
+.rb{grid-template-columns:minmax(170px,1.2fr) minmax(200px,2.2fr) 48px 92px 60px}
+.rc{grid-template-columns:minmax(150px,1fr) 118px minmax(200px,2fr) 48px 92px 60px}
+.rd{grid-template-columns:16px minmax(170px,1.2fr) minmax(200px,2.2fr) 48px 92px 60px}
+.re{grid-template-columns:16px minmax(170px,1.2fr) minmax(180px,2fr) 120px 92px 60px}
+.badge{width:30px;height:30px;border-radius:7px;display:grid;place-items:center}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:10px;vertical-align:1px}
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:5px;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden}
+.tag .i{width:13px;height:13px}
+.size{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.size i{display:block;height:6px;border-radius:3px}
+</style></helmet>
+<div class="sl">
+<main class="wrap" style="padding-top: 8px; padding-bottom: 56px">
+<section class="opt" aria-label="A · Icon tile">
+<h2>A · Icon tile</h2>
+<p>The category icon on a soft tile of its colour. Reads at a glance, no stripe.</p>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a class="r ra" href="Mp-Group.dc.html"><span class="badge" style="background: {{r.tint}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.fg}}"><path d="{{r.icon}}"/></svg></span><span class="who">{{r.org}} <span>{{r.topic}}</span></span><span class="sum">{{r.sum}}</span>
+<span class="n">{{r.n}}</span>
+<span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span>
+<span class="d">{{r.d}}</span></a>
+</sc-for>
+</section>
+<section class="opt" aria-label="B · Colour dot">
+<h2>B · Colour dot</h2>
+<p>A small dot before the sender. Quietest option; colour is just a hint.</p>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a class="r rb" href="Mp-Group.dc.html"><span class="who"><span class="dot" style="background: {{r.c}}"></span>{{r.org}} <span>{{r.topic}}</span></span><span class="sum">{{r.sum}}</span>
+<span class="n">{{r.n}}</span>
+<span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span>
+<span class="d">{{r.d}}</span></a>
+</sc-for>
+</section>
+<section class="opt" aria-label="C · Category tag">
+<h2>C · Category tag</h2>
+<p>The category named in a tinted tag. Most explicit, costs a column.</p>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a class="r rc" href="Mp-Group.dc.html"><span class="who">{{r.org}} <span>{{r.topic}}</span></span><span class="tag" style="background: {{r.tint}}; color: {{r.fg}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.fg}}"><path d="{{r.icon}}"/></svg>{{r.cat}}</span><span class="sum">{{r.sum}}</span>
+<span class="n">{{r.n}}</span>
+<span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span>
+<span class="d">{{r.d}}</span></a>
+</sc-for>
+</section>
+<section class="opt" aria-label="D · Coloured icon only">
+<h2>D · Coloured icon only</h2>
+<p>Just the category icon in its colour. Minimal, like the bar's labels.</p>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a class="r rd" href="Mp-Group.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.fg}}"><path d="{{r.icon}}"/></svg><span class="who">{{r.org}} <span>{{r.topic}}</span></span><span class="sum">{{r.sum}}</span>
+<span class="n">{{r.n}}</span>
+<span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span>
+<span class="d">{{r.d}}</span></a>
+</sc-for>
+</section>
+<section class="opt" aria-label="E · Size bar">
+<h2>E · Size bar</h2>
+<p>The count gets a short bar in the category colour, echoing the spectrum above.</p>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<a class="r re" href="Mp-Group.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: {{r.fg}}"><path d="{{r.icon}}"/></svg><span class="who">{{r.org}} <span>{{r.topic}}</span></span><span class="sum">{{r.sum}}</span><span class="size"><i style="width: {{r.w}}; background: {{r.c}}"></i>{{r.n}}</span><span class="vl {{r.v}}"><span class="vs {{r.v}}"></span>{{r.vl}}</span><span class="d">{{r.d}}</span></a>
+</sc-for>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {"rows": [{"org": "Medium", "topic": "daily digest", "cat": "Newsletters", "sum": "Daily picks of stories based on what you read.", "n": 88, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8", "c": "#c9b48c", "tint": "#efe7d8", "fg": "#8a7552", "w": "72px"}, {"org": "GitHub", "topic": "ci failure", "cat": "Dev Tools", "sum": "Failed workflow runs on your repositories.", "n": 72, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M16 18l6-6-6-6M8 6l-6 6 6 6", "c": "#2fb3a3", "tint": "#d6f1ec", "fg": "#13867a", "w": "59px"}, {"org": "Zalando", "topic": "promotion", "cat": "Promotions", "sum": "Sales and new arrivals.", "n": 64, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01", "c": "#c9b48c", "tint": "#efe7d8", "fg": "#8a7552", "w": "52px"}, {"org": "LinkedIn", "topic": "notification", "cat": "Social", "sum": "Profile views, likes and suggested connections.", "n": 54, "v": "go", "vl": "Can go", "d": "20 Nov", "icon": "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8a4 4 0 1 0 0-8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75", "c": "#9b7bea", "tint": "#e9e1fb", "fg": "#6f4fd0", "w": "44px"}, {"org": "Substack", "topic": "newsletter", "cat": "Newsletters", "sum": "Weekly posts from writers you follow.", "n": 53, "v": "go", "vl": "Can go", "d": "19 Nov", "icon": "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8", "c": "#c9b48c", "tint": "#efe7d8", "fg": "#8a7552", "w": "43px"}]};
+  }
+}
+</script>
+</body>
+</html>

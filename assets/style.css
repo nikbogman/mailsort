@@ -1,4 +1,4 @@
-/* Map design: the inbox as a treemap. Colour = category group, red hatching = can go. */
+/* mailsort: the inbox as a spectrum. Colour = category group, red = can go. */
 :root {
   --font: "Figtree", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --head: "Bricolage Grotesque", var(--font);
@@ -107,10 +107,10 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 
 /* ---------- category hues ---------- */
 
-.hue-imp { --tb: var(--imp); --tf: var(--imp-fg); }
-.hue-dev { --tb: var(--dev); --tf: var(--dev-fg); }
-.hue-upd { --tb: var(--upd); --tf: var(--upd-fg); }
-.hue-low { --tb: var(--low); --tf: var(--low-fg); }
+.hue-imp { --tb: var(--imp); --tf: var(--imp-fg); --sc: #5b8def; }
+.hue-dev { --tb: var(--dev); --tf: var(--dev-fg); --sc: #2fb3a3; }
+.hue-upd { --tb: var(--upd); --tf: var(--upd-fg); --sc: #9b7bea; }
+.hue-low { --tb: var(--low); --tf: var(--low-fg); --sc: #c9b48c; }
 .hue-none { --tb: var(--none); --tf: var(--muted); }
 .fg-imp { color: var(--imp-fg) !important; }
 .fg-dev { color: var(--dev-fg) !important; }
@@ -176,7 +176,7 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 .icon.danger:hover { color: var(--danger-text); }
 .banner .icon { color: var(--danger-text); width: 28px; height: 28px; }
 
-.btn:focus-visible, .icon:focus-visible, .tile:focus-visible, .lg:focus-visible, .crumb:focus-visible, .brand:focus-visible {
+.btn:focus-visible, .icon:focus-visible, .lg:focus-visible, .crumb:focus-visible, .brand:focus-visible {
   outline: 2px solid var(--text); outline-offset: 2px;
 }
 
@@ -201,13 +201,29 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 
 /* ---------- map page ---------- */
 
-.map-scroll { flex: 1; overflow: auto; }
-.map-page { max-width: 1240px; margin: 0 auto; padding: 8px 24px 120px; }
-.map-head { margin-bottom: 18px; }
-.map-title { min-width: 0; }
-.map-title h1 { margin: 0; font: 700 32px/1.1 var(--head); letter-spacing: -0.02em; }
-.map-title p { margin: 6px 0 0; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.map-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; min-height: 36px; }
+.home-scroll { flex: 1; overflow: auto; }
+.home { max-width: 1160px; margin: 0 auto; padding: 8px 24px 120px; }
+.home-total { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-top: 16px; }
+.home-total h1 { margin: 0; font: 700 44px/1 var(--head); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.home-total > span { color: var(--muted); }
+.home-total .unsorted { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.home-total .unsorted svg { width: 14px; height: 14px; }
+
+/* The spectrum: saturated icon colours, lighter steps per category (opacity set inline). */
+.spectrum { display: flex; gap: 4px; height: 44px; margin-top: 20px; }
+.fam { display: flex; gap: 2px; min-width: 0; border-radius: var(--r); overflow: hidden; }
+.seg { all: unset; min-width: 10px; height: 100%; background: var(--sc); cursor: pointer; transition: opacity 0.15s; }
+.seg:hover { filter: brightness(1.08) saturate(1.1); }
+.seg:focus-visible { box-shadow: inset 0 0 0 2px var(--text); }
+.seg.on { box-shadow: inset 0 0 0 2px var(--text); }
+.seg.dim { opacity: 0.18 !important; }
+.fam-labels { display: flex; gap: 4px; margin-top: 10px; }
+.fam-labels > span { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; overflow: hidden; white-space: nowrap; }
+.fam-labels svg { color: var(--sc); }
+.fam-labels b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.fam-labels em { font-style: normal; color: var(--muted); }
+
+.filter-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 28px; min-height: 36px; }
 .legend { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--panel); }
 .lg {
   all: unset; display: inline-flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer;
@@ -215,54 +231,30 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 }
 .lg:hover { background: var(--hover); }
 .lg.on { background: var(--hover); border-color: var(--border-strong); color: var(--text); }
-.map-actions { display: flex; gap: 8px; margin-left: auto; }
+.filter-actions { display: flex; gap: 8px; margin-left: auto; }
 
-.new-groups { position: sticky; top: 8px; z-index: 5; display: flex; justify-content: center; margin: 0 0 12px; }
+.new-groups { position: sticky; top: 8px; z-index: 5; display: flex; justify-content: center; margin: 12px 0 0; }
 .new-groups .btn { border-radius: 999px; box-shadow: var(--shadow); }
 
-.treemap { position: relative; width: 100%; aspect-ratio: 2 / 1; min-height: 360px; margin: 0 -2px; }
-.cell { position: absolute; padding: 2px; }
-.tile {
-  all: unset; box-sizing: border-box; position: relative; overflow: hidden; width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px;
-  border-radius: var(--r-lg); background: var(--tb); color: var(--text); cursor: pointer;
-  transition: box-shadow 0.12s, opacity 0.12s;
+/* Group rows: equal height, the category shown by its coloured icon. */
+.groups { margin-top: 18px; }
+.grow { all: unset; box-sizing: border-box; width: 100%; min-height: 48px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.groups-head, .grow {
+  display: grid; grid-template-columns: 16px minmax(170px, 1.2fr) minmax(200px, 2.2fr) 52px 110px 64px;
+  gap: 16px; align-items: center; padding: 0 12px;
 }
-.tile:hover { box-shadow: inset 0 0 0 2px var(--text); }
-.tile.sel { box-shadow: inset 0 0 0 3px var(--text); }
-.tile.dim { opacity: 0.55; cursor: default; }
-.tile.dim:hover { box-shadow: none; }
-.tile.unsorted { background: repeating-linear-gradient(-45deg, var(--none) 0 8px, var(--bg) 8px 16px); box-shadow: inset 0 0 0 2px var(--border-strong); cursor: default; }
-/* Labels sit on a chip of the tile's own colour so the hatching never runs under text. */
-.tile > span:not(.hatch):not(.check) {
-  position: relative; max-width: 100%; padding: 1px 6px; margin-left: -6px; border-radius: 4px; background: var(--tb);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.tile.unsorted > span:not(.hatch) { background: var(--bg); }
-.hatch {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  background: repeating-linear-gradient(45deg, var(--hatch) 0 2px, transparent 2px 7px); border-top: 2px solid var(--danger);
-}
-.tile .check { position: absolute; top: 10px; right: 10px; }
-.t-name { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; }
-.t-name svg { width: 14px; height: 14px; color: var(--tf); }
-.t-sub { font-size: 12.5px; color: var(--text-2); }
-.t-count { font: 700 20px/1.15 var(--head); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.tile.big .t-count { font-size: 40px; line-height: 1.05; }
-.t-foot { font-size: 12.5px; color: var(--text-2); margin-top: auto; }
-.tile.tiny { padding: 8px; }
-.tile.tiny .t-count { font-size: 15px; }
-/* Each tile drops what doesn't fit at its real size instead of squashing it. */
-.tile { container-type: size; }
-.tile > span { flex-shrink: 0; }
-@container (max-width: 150px) { .t-foot { display: none; } }
-@container (max-height: 100px) { .t-foot, .t-sub { display: none; } }
-@container (max-width: 100px) { .t-name svg { display: none; } }
-
-.hue-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; font-size: 13px; color: var(--text-2); }
-.hue-legend > span { display: inline-flex; align-items: center; gap: 8px; }
-.sw { width: 14px; height: 14px; border-radius: 4px; background: var(--tb); box-shadow: inset 0 0 0 1px var(--tf); }
-.sw-hatch { background: repeating-linear-gradient(45deg, var(--hatch) 0 2px, transparent 2px 5px); box-shadow: inset 0 0 0 1px var(--danger); }
+.groups-head { height: 32px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border-strong); }
+.groups-head .r { text-align: right; }
+.grow:hover { background: var(--panel); }
+.grow:focus-visible { box-shadow: inset 0 0 0 2px var(--text); }
+.grow.sel { background: var(--danger-soft); }
+.grow .gi { display: grid; place-items: center; color: var(--tf); }
+.grow .who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grow .who span { font-weight: 400; color: var(--muted); }
+.grow .sum { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grow .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.grow .d { text-align: right; font-size: 13px; color: var(--muted); }
+.grow .mark { font-size: 13px; }
 
 .selection-bar {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 15;

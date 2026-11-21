@@ -1,19 +1,18 @@
 //! App state, data loading, and the root component.
 //!
-//! Home is the map: a treemap of categories, then of groups (organization, topic), each group with a summary and
-//! verdict. Opening a group (or Trash) shows its emails with the reader.
+//! Home is the spectrum: one bar of the inbox by category, then the list of groups (organization, topic), each
+//! with a summary and verdict. Opening a group (or Trash) shows its emails with the reader.
 //!
-//! Updates while you look at the screen: cards keep their place (`order`); new groups found by a
-//! running sync wait in `held` behind a "Show N new groups" button instead of pushing cards around.
+//! Updates while you look at the screen: rows keep their place (`order`); new groups found by a
+//! running sync wait in `held` behind a "Show N new groups" button instead of pushing rows around.
 
 mod format;
 mod list;
-mod map;
+mod home;
 mod overlays;
 mod reader;
 mod setup;
 mod topbar;
-mod treemap;
 
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
@@ -73,7 +72,7 @@ pub struct State {
     pub loading: Signal<bool>,
     pub selected: Signal<HashSet<String>>,
     pub selected_groups: Signal<HashSet<String>>,
-    /// Map select mode: clicking a block selects what can go instead of opening it.
+    /// Select mode: clicking a group row selects it instead of opening it.
     pub selecting: Signal<bool>,
     /// Email open in the reader.
     pub open: Signal<Option<String>>,
@@ -354,7 +353,7 @@ fn ask_delete(mut s: State, ids: Vec<String>) {
     }
 }
 
-/// Email totals per verdict and per category, for the map header.
+/// Email totals per verdict and per category, for the home header.
 fn totals(groups: &[Group]) -> (HashMap<Verdict, usize>, HashMap<String, usize>) {
     let mut by_verdict = HashMap::new();
     let mut by_category = HashMap::new();
@@ -432,7 +431,7 @@ pub fn App() -> Element {
                     }
                 }
             } else {
-                main { class: "map-scroll", map::MapView {} }
+                main { class: "home-scroll", home::Home {} }
             }
         }
         overlays::Queue {}
@@ -448,7 +447,7 @@ fn on_key(mut s: State, e: Event<KeyboardData>) {
         return;
     }
     match e.key() {
-        // Esc steps back one level: reader, selection, select mode, group, then up the map.
+        // Esc steps back one level: reader, selection, select mode, group, then back to all mail.
         Key::Escape if s.open.peek().is_some() => s.open.set(None),
         Key::Escape if s.has_selection() => s.clear_selection(),
         Key::Escape if *s.selecting.peek() => s.selecting.set(false),

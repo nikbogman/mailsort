@@ -1,9 +1,9 @@
-//! Top bar: logo, breadcrumb (where you are in the map), sync status, search, Trash.
+//! Top bar: logo, breadcrumb (where you are), sync status, search, Trash.
 
 use dioxus::prelude::*;
 
 use super::list::SearchBox;
-use super::map::hue;
+use super::home::hue;
 use super::{Filter, State, SyncState, close_group, show, start_sync};
 use crate::icons::icon;
 use crate::sync::{self, Stage};
