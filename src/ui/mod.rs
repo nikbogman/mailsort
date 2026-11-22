@@ -1,8 +1,8 @@
 //! App state, data loading, and the root component.
 //!
 //! A sidebar lists every view (all mail, verdicts, categories, Trash). Home is the view's groups (organization,
-//! topic), each with a summary and verdict, a page at a time. Opening a group keeps the groups in a column beside
-//! its emails and the reader.
+//! topic), each with a summary and verdict, a page at a time. Opening a group shrinks that list to the left and
+//! shows its emails beside it, which open in place.
 //!
 //! Updates while you look at the screen: rows keep their place (`order`); new groups found by a
 //! running sync wait in `held` behind a "Show N new groups" button instead of pushing rows around.
@@ -11,7 +11,6 @@ mod format;
 mod list;
 mod home;
 mod overlays;
-mod reader;
 mod setup;
 mod sidebar;
 mod topbar;
@@ -29,7 +28,6 @@ use dioxus::prelude::*;
 use crate::db::{self, Email};
 use crate::google;
 use crate::groups::{self, Group, Verdict};
-use crate::icons;
 use crate::queue::{self, Job, Kind};
 use crate::sync::{self, Stage};
 
@@ -87,7 +85,7 @@ pub struct State {
     /// Page of the group list (0-based) and its sort.
     pub page: Signal<usize>,
     pub sort: Signal<Sort>,
-    /// Email open in the reader.
+    /// Email open (expanded) in the list.
     pub open: Signal<Option<String>>,
     pub query: Signal<String>,
     pub jobs: Signal<Vec<Job>>,
@@ -295,107 +293,52 @@ fn show_held(mut s: State) {
     s.groups.write().extend(held);
 }
 
-fn show(s: State, filter: Filter) {
-    // From a group's column back to a full list: the rows change layout.
-    let rows = s.group.peek().is_some();
-    animate(rows, move || {
-        let mut s = s;
-        let trash = filter == Filter::Trash;
-        s.filter.set(filter);
-        s.group.set(None);
-        s.open.set(None);
-        s.selecting.set(false);
-        s.page.set(0);
-        s.clear_selection();
-        // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
-        let cached = if trash { s.trash_cache.peek().clone() } else { None };
-        s.loading.set(trash && cached.is_none());
-        s.emails.set(cached.unwrap_or_default());
-        spawn_forever(refresh(s, true));
-    });
+fn show(mut s: State, filter: Filter) {
+    let trash = filter == Filter::Trash;
+    s.filter.set(filter);
+    s.group.set(None);
+    s.open.set(None);
+    s.selecting.set(false);
+    s.page.set(0);
+    s.clear_selection();
+    // Trash comes from Gmail and takes a moment: show the last listing meanwhile.
+    let cached = if trash { s.trash_cache.peek().clone() } else { None };
+    s.loading.set(trash && cached.is_none());
+    s.emails.set(cached.unwrap_or_default());
+    spawn_forever(refresh(s, true));
+    settle();
 }
 
-fn open_group(s: State, g: &Group) {
-    let (key, ids) = (g.key.clone(), g.ids.clone());
-    // From the full list the rows shrink into the column; within the column they stay put.
-    let rows = s.group.peek().is_none();
-    animate(rows, move || {
-        let mut s = s;
-        s.group.set(Some(key));
-        s.open.set(None);
-        s.selected.write().clear();
-        s.emails.set(db::by_ids(&ids));
-    });
+fn open_group(mut s: State, g: &Group) {
+    s.group.set(Some(g.key.clone()));
+    s.open.set(None);
+    s.selected.write().clear();
+    s.emails.set(db::by_ids(&g.ids));
+    settle();
 }
 
-fn close_group(s: State) {
-    animate(true, move || {
-        let mut s = s;
-        s.group.set(None);
-        s.open.set(None);
-        s.selected.write().clear();
-        s.emails.write().clear();
-    });
+fn close_group(mut s: State) {
+    s.group.set(None);
+    s.open.set(None);
+    s.selected.write().clear();
+    s.emails.write().clear();
+    settle();
 }
 
-/// Open an email (or close it with `None`).
+/// Open an email (or close it with `None`). It expands in place; CSS animates it (`.mail-more`).
 fn read_email(mut s: State, id: Option<String>) {
-    animate(false, move || s.open.set(id));
+    s.open.set(id);
 }
 
-/// Runs a view change inside a View Transition: the browser snapshots the old layout, the change
-/// renders, then it morphs one into the other (the moving parts are named in style.css). Waits
-/// for `.shell[data-view]` to change before letting the new layout show. No API or reduced
-/// motion: the change just happens.
-///
-/// `rows`: the group list changes layout, so its rows on screen (and their parts) get names for
-/// this one transition and move individually. Only those on screen: every name is a layer to
-/// animate, and naming all rows made it stutter.
-fn animate(rows: bool, change: impl FnOnce() + 'static) {
-    const JS: &str = r#"
-        const rows = await dioxus.recv();
-        // The clicked button may be gone after the change: give focus back to the app so Esc still works.
-        setTimeout(() => { if (document.activeElement === document.body) document.querySelector(".app")?.focus({ preventScroll: true }); }, 350);
-        const shell = document.querySelector(".shell");
-        // Name the group rows on screen (from `keep`, if given) and their parts; returns their keys.
-        const named = [];
-        const name = (keep) => {
-            const keys = new Set();
-            for (const row of document.querySelectorAll(".grow[data-vt]")) {
-                const r = row.getBoundingClientRect();
-                const k = row.dataset.vt;
-                if (r.bottom < 0 || r.top > innerHeight || (keep && !keep.has(k))) continue;
-                keys.add(k);
-                [row, ...row.children].forEach((el, i) => { el.style.viewTransitionName = i ? `${k}-${i}` : k; named.push(el); });
-            }
-            return keys;
-        };
-        if (!document.startViewTransition || !shell || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            dioxus.send(true);
-        } else {
-            const before = shell.dataset.view;
-            const shown = rows ? name() : null;
-            const vt = document.startViewTransition(() => new Promise(done => {
-                const finish = () => {
-                    watch.disconnect(); clearTimeout(late);
-                    document.querySelector(".rail .grow.on")?.scrollIntoView({ block: "nearest" }); // the open group in view
-                    if (shown) name(shown);
-                    done();
-                };
-                const watch = new MutationObserver(() => { if (shell.dataset.view !== before) finish(); });
-                watch.observe(shell, { attributes: true, attributeFilter: ["data-view"] });
-                const late = setTimeout(finish, 300); // nothing changed (same view): don't hang
-                dioxus.send(true);
-            }));
-            vt.finished.finally(() => named.forEach(el => el.style.viewTransitionName = ""));
-        }
-    "#;
-    spawn(async move {
-        let mut js = document::eval(JS);
-        let _ = js.send(rows);
-        let _ = js.recv::<bool>().await;
-        change();
-    });
+/// After a view switch (which CSS fades in, see `.detail` in style.css): the open group in view in the
+/// narrowed list, and focus back on the app if the clicked button is gone, so Esc still works.
+fn settle() {
+    document::eval(
+        r#"requestAnimationFrame(() => {
+            document.querySelector(".lp .grow.on")?.scrollIntoView({ block: "nearest" });
+            if (document.activeElement === document.body) document.querySelector(".app")?.focus({ preventScroll: true });
+        })"#,
+    );
 }
 
 /// How often a running sync may refresh the screen.
@@ -497,46 +440,35 @@ pub fn App() -> Element {
         };
     }
 
-    let open = s.open.read().clone();
-    // Changes whenever the layout does; `animate` waits for it.
-    let view = format!("{:?}|{:?}|{:?}", s.filter.read(), s.group.read(), open);
+    let filter = format!("{:?}", s.filter.read());
+    let open_key = s.group.read().clone();
     rsx! {
         div { class: "app", tabindex: "0", autofocus: true, onkeydown: move |e| on_key(s, e),
             topbar::TopBar {}
             overlays::ErrorBanner {}
-            div { class: "shell", "data-view": "{view}",
+            div { class: "shell",
                 sidebar::Sidebar {}
                 if s.in_trash() {
-                    // Trash: list and reader side by side.
-                    main { class: "content",
-                        section { class: "list-pane",
+                    main { class: "columns",
+                        section { class: "detail", key: "trash",
                             list::EmailToolbar {}
                             list::EmailList {}
                         }
-                        if let Some(id) = open {
-                            reader::Reader { key: "{id}" }
-                        } else {
-                            div { class: "reader-empty",
-                                span { class: "empty-icon", {icons::icon("mail")} }
-                                "Select an email to read it"
-                            }
-                        }
-                    }
-                } else if s.group.read().is_some() {
-                    // Reading: the groups stay in a column; the open group's emails (or one email) fill the rest.
-                    main { class: "columns",
-                        home::GroupRail {}
-                        section { class: "detail",
-                            if let Some(id) = open {
-                                reader::Reader { key: "{id}" }
-                            } else {
-                                list::EmailToolbar {}
-                                list::EmailList {}
-                            }
-                        }
                     }
                 } else {
-                    main { class: "home-scroll", home::Home {} }
+                    // The groups list stays; with a group open it shrinks left and the group's emails slide in.
+                    main { class: if open_key.is_some() { "lay split" } else { "lay" },
+                        section { class: "lp home-scroll", key: "{filter}", home::Home {} }
+                        section { class: "dp",
+                            if let Some(k) = &open_key {
+                                // Keyed by group: switching groups swaps (and fades in) only this pane.
+                                section { class: "detail", key: "{k}",
+                                    list::EmailToolbar {}
+                                    list::EmailList {}
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

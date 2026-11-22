@@ -1,10 +1,10 @@
 //! Home: the groups of the current view as a paged list (the sidebar picks the view).
-//! With a group open, the same groups shrink to a rail beside its emails.
+//! With a group open, the same list shrinks to the left and the group's emails slide in beside it.
 
 use dioxus::prelude::*;
 
 use super::format::{check, fmt_date};
-use super::{Filter, Sort, State, ask_delete, close_group, open_group, show_held};
+use super::{Filter, Sort, State, ask_delete, open_group, show_held};
 use crate::classify::CATEGORIES;
 use crate::groups::{Group, Verdict};
 use crate::icons::icon;
@@ -28,7 +28,7 @@ pub fn verdict_mark(v: Option<Verdict>) -> Element {
         None => ("pending", "Summarizing…"),
     };
     rsx! {
-        span { class: "mark mark-{class}", span { class: "vs" } "{label}" }
+        span { class: "mark mark-{class}", span { class: "vs" } span { class: "ml", "{label}" } }
     }
 }
 
@@ -159,24 +159,22 @@ fn GroupList(groups: Vec<Group>) -> Element {
     let s = use_context::<State>();
     let selecting = *s.selecting.read();
     let picked = s.selected_groups.read().clone();
+    let open = s.group.read().clone();
     rsx! {
         div { class: "groups", role: "list", "aria-label": "Groups",
             for g in groups {
-                GroupRow { key: "{g.key}", selected: picked.contains(&g.key), selecting, group: g }
+                GroupRow { key: "{g.key}", selected: picked.contains(&g.key), on: open.as_ref() == Some(&g.key), selecting, group: g }
             }
         }
     }
 }
 
-/// One row per group, the same in the paged list and the reading column (CSS lays it out on one
-/// line or stacked). `data-vt` lets `animate` move the rows on screen, and their parts, from one
-/// layout to the other.
+/// One row per group, one line. With a group open the list narrows and the row squeezes (CSS).
 #[component]
 fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] selected: bool, #[props(default)] on: bool) -> Element {
     let mut s = use_context::<State>();
     let g = group.clone();
     let summary = group.summary.as_ref().map_or_else(|| format!("Latest: {}", group.subject), |x| x.summary.clone());
-    let vt = transition_name(&group.key);
     rsx! {
         button {
             class: "grow hue-{hue(&group.category)}",
@@ -185,7 +183,6 @@ fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] s
             role: "listitem",
             "aria-current": if on { "true" },
             title: "{group.category}",
-            "data-vt": "{vt}",
             onclick: move |_| {
                 if selecting {
                     let mut sel = s.selected_groups.write();
@@ -211,12 +208,6 @@ fn GroupRow(group: Group, #[props(default)] selecting: bool, #[props(default)] s
     }
 }
 
-/// A CSS-safe name unique to a group key (keys hold any characters).
-fn transition_name(key: &str) -> String {
-    let hash = key.bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ b as u64).wrapping_mul(0x100000001b3));
-    format!("g{hash:x}")
-}
-
 /// Title and counts of the current view: the same element above the list and above the column.
 #[component]
 fn ViewTitle(groups: usize, emails: usize) -> Element {
@@ -225,31 +216,6 @@ fn ViewTitle(groups: usize, emails: usize) -> Element {
         div { class: "view-title",
             h1 { "{title(&s.filter.read())}" }
             span { class: "muted", "{emails} emails · {groups} groups" }
-        }
-    }
-}
-
-/// With a group open: the view's groups as a narrow column, so you can move between them while reading.
-#[component]
-pub fn GroupRail() -> Element {
-    let s = use_context::<State>();
-    let groups = s.visible_groups();
-    let open = s.group.read().clone();
-    let emails: usize = groups.iter().map(|g| g.ids.len()).sum();
-    rsx! {
-        section { class: "rail", "aria-label": "Groups",
-            header { class: "rail-head",
-                button { class: "btn small back", title: "Back to all groups (Esc)", onclick: move |_| close_group(s),
-                    {icon("back")}
-                    "All groups"
-                }
-                ViewTitle { groups: groups.len(), emails }
-            }
-            div { class: "rail-list", role: "list",
-                for g in groups {
-                    GroupRow { key: "{g.key}", on: open.as_ref() == Some(&g.key), group: g }
-                }
-            }
         }
     }
 }
@@ -309,13 +275,6 @@ fn Empty() -> Element {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn transition_names_are_css_safe_and_distinct() {
-        let (a, b) = (transition_name("Zalando|promo tion/€"), transition_name("Zalando|promotion"));
-        assert!(a.starts_with('g') && a.chars().all(|c| c.is_ascii_alphanumeric()));
-        assert_ne!(a, b);
-    }
 
     #[test]
     fn pages_round_up_and_never_zero() {

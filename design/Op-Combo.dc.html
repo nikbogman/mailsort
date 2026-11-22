@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shrinking list, emails open in place</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&amp;family=Figtree:wght@400;500;600;700&amp;display=swap"><style>
+body{margin:0}
+.app{--font:"Figtree",ui-sans-serif,system-ui,sans-serif;--head:"Bricolage Grotesque",var(--font);
+--bg:#f7f7f5;--panel:#fff;--text:#1b1d22;--text-2:#3d414b;--muted:#5d6270;--border:#e3e3de;--border-strong:#c9c9c3;--hover:#efefeb;
+--danger:#d93636;--danger-text:#b42323;--low:#efe7d8;--low-fg:#8a7552;
+--ease:cubic-bezier(0.2,0.8,0.2,1);--dur:.36s;
+font-family:var(--font);font-size:14px;line-height:1.45;color:var(--text);background:var(--bg);height:900px;display:flex;flex-direction:column;overflow:hidden}
+.app button{font:inherit;color:inherit}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;gap:10px;min-height:60px;padding:0 24px;flex:none}
+.brand{display:inline-flex;align-items:center;gap:10px;font:700 18px var(--head);letter-spacing:-.02em}
+.logo{width:24px;height:24px;border-radius:6px;background:var(--text);display:grid;place-items:center;color:var(--bg)}
+.crumbs{display:flex;gap:8px;font-size:13.5px;color:var(--muted)}
+.sp{flex:1}
+.shell{flex:1;display:flex;min-height:0}
+.side{flex:0 0 236px;box-sizing:border-box;padding:8px 10px;border-right:1px solid var(--border)}
+.si{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:6px;font-size:13.5px}
+.si span{flex:1}.si em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.si.on{background:var(--panel);box-shadow:inset 0 0 0 1px var(--border-strong);font-weight:600}
+.fam{margin:14px 10px 4px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font:700 22px/1.2 var(--head);letter-spacing:-.015em}
+.sub{font-size:13px;color:var(--muted)}
+.groups{border:1px solid var(--border);border-radius:8px;background:var(--panel);overflow:hidden}
+/* THE group row: one line, the same everywhere. */
+.gw{display:flex;align-items:center;gap:14px;width:100%;min-height:46px;padding:0 14px;box-sizing:border-box;border:0;border-bottom:1px solid var(--border);background:none;text-align:left;cursor:pointer;transition:background .15s,box-shadow .2s}
+.gw:hover{background:var(--hover)}
+.gi{color:var(--low-fg);display:grid;place-items:center;flex:none}
+.who{flex:1 1 170px;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.who span{font-weight:400;color:var(--muted)}
+.sum{flex:2 1 0;min-width:0;font-size:13.5px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n{flex:none;width:34px;text-align:right;font-size:13px;color:var(--text-2)}
+.vl{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--danger-text);font-weight:600;white-space:nowrap;overflow:hidden}
+.vs{width:10px;height:10px;border-radius:3px;background:var(--danger);flex:none}
+.tb{display:flex;align-items:center;gap:12px;height:54px;padding:0 14px 0 16px;border-bottom:1px solid var(--border);flex:none}
+.tb h2{margin:0;font:700 16px var(--head)}
+.btn{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border:1px solid var(--border-strong);border-radius:6px;background:var(--panel);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn.danger{border-color:var(--danger);background:var(--danger);color:#fff}
+.gh{margin:14px 0;padding:18px 20px;border-radius:8px;background:var(--low)}
+.gh h3{margin:6px 0 0;font:700 24px/1.1 var(--head);letter-spacing:-.02em}
+.gh p{margin:10px 0 0}
+.mail{display:grid;grid-template-columns:32px minmax(0,1fr);gap:0 14px;padding:12px 14px;border-top:1px solid var(--border)}
+.av{width:32px;height:32px;border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:13px;background:hsl(150 60% 92%);color:hsl(150 45% 30%)}
+.l1{display:flex;gap:10px}.l1 b{flex:1}.l1 span{font-size:12px;color:var(--muted)}
+.snip{font-size:13px;color:var(--muted)}
+.enter{animation:enter .22s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}}
+
+.lay{flex:1;display:flex;min-width:0;position:relative}
+.lp{flex:0 0 100%;display:flex;flex-direction:column;min-width:0;padding:16px 24px;box-sizing:border-box;transition:flex-basis var(--dur) var(--ease),padding var(--dur) var(--ease)}
+.split .lp{flex-basis:380px;padding:16px 0 0 16px}
+.lp .groups{margin-top:14px;overflow:auto;transition:border-radius var(--dur) var(--ease)}
+.split .lp .groups{border-radius:8px 0 0 0;border-right:0}
+.split .sum{opacity:0}
+.sum{transition:opacity .2s}
+.vt{display:inline-block;max-width:60px;transition:max-width var(--dur) var(--ease),opacity .2s}
+.split .vt{max-width:0;opacity:0}
+.grp.on .gw{background:var(--panel);box-shadow:inset 3px 0 0 var(--text)}
+.dp{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--border);opacity:0;transform:translateX(40px);transition:opacity .25s,transform var(--dur) var(--ease);pointer-events:none}
+.split .dp{opacity:1;transform:none;pointer-events:auto}
+.dp .pane{flex:1;display:flex;flex-direction:column;min-height:0}
+.back{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:6px;background:none;cursor:pointer;color:var(--muted)}
+.back:hover{background:var(--hover);color:var(--text)}
+
+/* Email: board 6's card, a row that opens in place. */
+.ml{flex:1;overflow:auto;padding:0 14px 60px;scroll-behavior:smooth}
+.mail{display:block;padding:0;border-top:0;border-radius:8px;transition:margin var(--dur) var(--ease),box-shadow var(--dur) var(--ease),background var(--dur) var(--ease)}
+.mail + .mail .head{border-top:1px solid var(--border)}
+.mail.open{margin:10px 0;background:var(--panel);box-shadow:0 0 0 1px var(--border),0 10px 28px rgb(16 16 24 / .09)}
+.mail.open .head,.mail.open + .mail .head{border-top-color:transparent}
+.head{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:0 14px;align-items:start;padding:12px 14px;cursor:pointer;border-radius:8px;transition:background .15s}
+.head:hover{background:var(--hover)}
+.mail.open .head:hover{background:transparent}
+.date{font-size:12px;color:var(--muted)}
+.mail.open .subj{font:700 17px/1.35 var(--head);letter-spacing:-.01em}
+.snp{position:relative;height:20px;font-size:13px;color:var(--muted)}
+.snp span{position:absolute;inset:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.snp .b{opacity:0;transform:translateY(4px)}
+.mail.open .snp .a{opacity:0;transform:translateY(-4px)}
+.mail.open .snp .b{opacity:1;transform:none}
+.acts{display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.head:hover .acts,.mail.open .acts{opacity:1}
+.ib{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:6px;background:none;color:var(--muted);cursor:pointer}
+.ib:hover{background:var(--hover);color:var(--text)}
+.more{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur) var(--ease)}
+.mail.open .more{grid-template-rows:1fr}
+.more > div{min-height:0;overflow:hidden}
+.body{padding:0 14px 14px 60px;opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform var(--dur) var(--ease)}
+.mail.open .body{opacity:1;transform:none;transition-delay:.06s}
+.ai{display:flex;gap:10px;padding:10px 14px;border-radius:6px;background:var(--hover);font-size:13px;color:var(--text-2)}
+.frame{margin-top:12px;height:330px;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#fff;padding:26px 30px;box-sizing:border-box;color:#1b1d22}
+.frame h3{margin:0 0 8px;font:700 20px/1.25 Georgia,serif}
+.frame p{margin:0 0 12px;color:#3d414b;font:15px/1.6 Georgia,serif}
+.frame .rule{height:1px;background:#e3e3de;margin:16px 0}
+.frame small{color:#5d6270}
+
+</style></helmet>
+<div class="app">
+<header class="top">
+<span class="brand"><span class="logo"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg></span>mailsort</span>
+<nav class="crumbs" aria-label="Breadcrumb"><span>Newsletters</span><span>{{crumb}}</span></nav>
+</header>
+<div class="shell">
+<nav class="side" aria-label="Views">
+<div class="si"><span>All mail</span><em>1,061</em></div>
+<div class="si"><span>Can go</span><em>412</em></div>
+<div class="fam">Low priority</div>
+<div class="si on"><span>Newsletters</span><em>172</em></div>
+<div class="si"><span>Promotions</span><em>156</em></div>
+<div class="si"><span>Trash</span><em>38</em></div>
+</nav>
+<main class="{{layout}}">
+<section class="lp" aria-label="Groups">
+<h1>Newsletters</h1><span class="sub">172 emails · 6 groups · click a group</span>
+<div class="groups" role="list">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="6">
+<div class="{{g.cls}}"><button class="gw" type="button" onClick="{{g.open}}"><span class="gi"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/></svg></span><span class="who">{{g.org}} <span>{{g.topic}}</span></span><span class="sum">{{g.sum}}</span><span class="n">{{g.n}}</span><span class="vl"><span class="vs"></span><span class="vt">Can go</span></span></button></div>
+</sc-for>
+</div>
+</section>
+<section class="dp" aria-label="Group">
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="1">
+<sc-if value="{{g.shown}}" hint-placeholder-val="{{ false }}">
+<div class="pane enter">
+<div class="tb"><button class="back" type="button" aria-label="Back to all groups" onClick="{{close}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><h2>{{g.org}}</h2><span class="sub">{{g.n}}</span><span class="sp"></span><span class="btn danger"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Trash all</span></div>
+<div class="ml">
+<div class="gh"><span style="color: #8a7552; font-weight: 600; font-size: 12.5px">Newsletters</span><h3>{{g.org}}</h3><p>{{g.sum}}</p></div>
+<sc-for list="{{g.mails}}" as="m" hint-placeholder-count="6">
+<article class="{{m.cls}}">
+<div class="head" onClick="{{m.toggle}}">
+<span class="av">{{g.initial}}</span>
+<div style="min-width: 0">
+<div style="display: flex; gap: 10px"><b style="flex: 1">{{g.org}}</b><span class="date">{{m.date}}</span></div>
+<div class="subj">{{m.subject}}</div>
+<div class="snp"><span class="a">{{m.snippet}}</span><span class="b">{{g.addr}} · {{m.full}}</span></div>
+</div>
+<div class="acts">
+<button class="ib" type="button" aria-label="Move to Trash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+<button class="ib" type="button" aria-label="Delete forever"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11l4 4M14 11l-4 4"/></svg></button>
+</div>
+</div>
+<div class="more"><div><div class="body">
+<div class="ai"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="margin-top: 2px"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg><span><b>{{g.org}}</b> · {{g.topic}} · Newsletters</span></div>
+<div class="frame">
+<small>{{g.org}}</small>
+<div class="rule"></div>
+<h3>{{m.subject}}</h3>
+<p>{{m.snippet}} A longer look at what changed, who it matters to, and what to try next.</p>
+<p>Plus: more stories picked for you, based on your reading history.</p>
+<div class="rule"></div>
+<small>You're getting this because you subscribed to {{g.org}}.</small>
+</div>
+</div></div></div>
+</article>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</sc-for>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const cur = st.g === undefined ? -1 : st.g;
+    const last = st.last === undefined ? 0 : st.last;
+    const openMail = st.m === undefined ? -1 : st.m;
+    const data = [
+      ['Medium', 'daily digest', 'Daily picks of stories based on what you read.', 88, 'M', 'noreply@medium.com', ['Why Rust is eating the backend', 'The quiet death of the side project', '10 CSS tricks you missed', 'Designing for calm', 'The case for boring tech', 'What a 3B model can do on a laptop', 'Your weekly reading recap', 'Stories you missed this month']],
+      ['Substack', 'newsletter', 'Weekly posts from writers you follow.', 53, 'S', 'no-reply@substack.com', ['A letter from the editor', 'What we read this week', 'On slow software', 'Notes from a small town', 'The long walk home', 'Why I stopped tweeting']],
+      ['The Verge', 'newsletter', 'Tech news in your inbox each morning.', 19, 'V', 'newsletter@theverge.com', ['The phone that folds twice', 'Inside the new chip race', 'Is the smart home dead?', 'The best laptops right now', 'Five gadgets we loved']],
+      ['Product Hunt', 'daily', 'Top launches of the day.', 12, 'P', 'hello@producthunt.com', ['Top 5 launches today', 'A new way to take notes', 'The best tools of the week', 'Makers to watch']],
+      ['Morning Brew', 'newsletter', 'Business news in five minutes.', 41, 'B', 'crew@morningbrew.com', ['Markets had a week', 'The coffee price problem', 'Why everyone is hiring again', 'A quiet Friday', 'Retail is back']],
+      ['Hacker Newsletter', 'weekly', 'The best links from Hacker News.', 27, 'H', 'kale@hackernewsletter.com', ['Show HN: a tiny database', 'Ask HN: what do you self-host?', 'The 4 kB web page', 'Rewriting it in Rust, again']]
+    ];
+    const snippets = ['Teams keep moving services over, and not only for speed.', 'Most of them end without anyone noticing.', 'Small things that change how you work.', 'Doing less, on purpose.', 'Pick the tool you will still understand at 3am.', 'Better than you think.', 'Everything you read, in one place.', 'Catch up in five minutes.'];
+    return {
+      layout: cur >= 0 ? 'lay split' : 'lay',
+      crumb: cur < 0 ? '' : '/ ' + data[cur][0],
+      close: () => this.setState({ g: -1, m: -1 }),
+      groups: data.map((d, i) => ({
+        org: d[0], topic: d[1], sum: d[2], n: d[3], initial: d[4], addr: d[5],
+        shown: i === (cur >= 0 ? cur : last),
+        cls: i === cur ? 'grp on' : 'grp',
+        open: () => this.setState({ g: i, last: i, m: -1 }),
+        mails: d[6].map((s, j) => ({
+          subject: s, snippet: snippets[j % snippets.length],
+          date: (20 - j) + ' Nov', full: (20 - j) + ' Nov 2026, 07:0' + (j % 6),
+          cls: i === cur && j === openMail ? 'mail open' : 'mail',
+          toggle: () => this.setState({ m: j === openMail ? -1 : j })
+        }))
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
