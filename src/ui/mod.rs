@@ -94,6 +94,8 @@ pub struct State {
     pub sync: Signal<SyncState>,
     pub error: Signal<Option<String>>,
     pub search: Signal<Option<Rc<MountedData>>>,
+    /// Closing a group: the list grows back while the group's emails stay until the animation ends.
+    pub closing: Signal<bool>,
 }
 
 impl State {
@@ -295,6 +297,7 @@ fn show_held(mut s: State) {
 
 fn show(mut s: State, filter: Filter) {
     let trash = filter == Filter::Trash;
+    s.closing.set(false);
     s.filter.set(filter);
     s.group.set(None);
     s.open.set(None);
@@ -310,6 +313,7 @@ fn show(mut s: State, filter: Filter) {
 }
 
 fn open_group(mut s: State, g: &Group) {
+    s.closing.set(false);
     s.group.set(Some(g.key.clone()));
     s.open.set(None);
     s.selected.write().clear();
@@ -318,11 +322,23 @@ fn open_group(mut s: State, g: &Group) {
 }
 
 fn close_group(mut s: State) {
-    s.group.set(None);
-    s.open.set(None);
-    s.selected.write().clear();
-    s.emails.write().clear();
-    settle();
+    if *s.closing.peek() {
+        return;
+    }
+    // Shrink the pane away first (--dur in style.css); clearing at once blanked it mid-animation.
+    s.closing.set(true);
+    spawn(async move {
+        crate::sleep(std::time::Duration::from_millis(320)).await;
+        if !*s.closing.peek() {
+            return; // another group or view was opened meanwhile
+        }
+        s.group.set(None);
+        s.open.set(None);
+        s.selected.write().clear();
+        s.emails.write().clear();
+        s.closing.set(false);
+        settle();
+    });
 }
 
 /// Open an email (or close it with `None`). It expands in place; CSS animates it (`.mail-more`).
@@ -417,6 +433,7 @@ pub fn App() -> Element {
         sync: use_signal(SyncState::default),
         error: use_signal(|| None),
         search: use_signal(|| None),
+        closing: use_signal(|| false),
         page: use_signal(|| 0),
         sort: use_signal(|| Sort::Size),
     };
@@ -457,7 +474,7 @@ pub fn App() -> Element {
                     }
                 } else {
                     // The groups list stays; with a group open it shrinks left and the group's emails slide in.
-                    main { class: if open_key.is_some() { "lay split" } else { "lay" },
+                    main { class: if open_key.is_some() && !*s.closing.read() { "lay split" } else { "lay" },
                         section { class: "lp home-scroll", key: "{filter}", home::Home {} }
                         section { class: "dp",
                             if let Some(k) = &open_key {

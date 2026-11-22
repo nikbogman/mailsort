@@ -229,7 +229,8 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 
 .home-scroll { flex: 1; overflow: auto; min-width: 0; }
 .home { max-width: 1120px; margin: 0 auto; padding: 16px 24px 96px; }
-.home-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.home-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; overflow: hidden; } /* one line: no wrapping while the list grows back */
+.home-head > :not(.spacer) { flex: none; }
 .home-head select.btn { padding-right: 8px; }
 .muted { color: var(--muted); }
 .pager { display: flex; align-items: center; gap: 4px; min-height: 52px; }
@@ -330,6 +331,7 @@ kbd { font: 600 11px/1 var(--font); padding: 3px 5px; border-radius: 4px; border
 .split .home { padding: 16px 0 24px 16px; }
 .home { transition: padding var(--dur) var(--ease); }
 .split .home-head > :not(.view-title) { display: none; } /* sort and select: on the full list */
+.home-head > :not(.view-title) { animation: fade 0.2s ease 0.2s both; } /* back from a group: after the list has grown */
 .split .groups { border-right: 0; border-radius: var(--r-lg) 0 0 var(--r-lg); }
 .dp { flex: 1; min-width: 0; display: flex; border-left: 1px solid var(--border); background: var(--panel); opacity: 0; transform: translateX(40px); transition: opacity 0.25s, transform var(--dur) var(--ease); }
 .split .dp { opacity: 1; transform: none; }
